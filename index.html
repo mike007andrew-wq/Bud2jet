@@ -4,3135 +4,3404 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
+      maximum-scale=1.0,user-scalable=no">
 
 <meta name="theme-color" content="#111827">
 
 <title>My Budget</title>
 
 <style>
-* {
-    box-sizing: border-box;
+
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    background: #f5f7fb;
-    color: #111827;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+body{
+    margin:0;
+    background:#f4f6f9;
+    color:#111827;
+    font-family:-apple-system,BlinkMacSystemFont,
+                 "Segoe UI",Roboto,Arial,sans-serif;
 }
 
-.container {
-    max-width: 760px;
-    margin: auto;
-    padding: 16px 14px 60px;
+.app{
+    max-width:760px;
+    margin:auto;
+    padding:16px 14px 60px;
 }
 
-h1 {
-    margin: 4px 0;
-    font-size: 30px;
+h1{
+    margin:5px 0;
+    font-size:30px;
 }
 
-h2 {
-    margin-top: 0;
+h2{
+    margin:0 0 14px;
+    font-size:22px;
 }
 
-.muted {
-    color: #6b7280;
+h3{
+    margin:16px 0 8px;
 }
 
-.card {
-    background: white;
-    border-radius: 20px;
-    padding: 16px;
-    margin: 12px 0;
-    box-shadow: 0 3px 18px rgba(0,0,0,.06);
+p{
+    margin:7px 0;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.muted{
+    color:#6b7280;
 }
 
-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    color: #6b7280;
-    margin-bottom: 6px;
+.card{
+    background:white;
+    border-radius:18px;
+    padding:16px;
+    margin:12px 0;
+    box-shadow:0 3px 18px rgba(0,0,0,.06);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.grid-3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    color:#6b7280;
+    font-size:11px;
+    font-weight:700;
 }
 
 input,
-select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #d7dce5;
-    border-radius: 12px;
-    font-size: 16px;
-    background: white;
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #d5d9e0;
+    border-radius:11px;
+    background:white;
+    color:#111827;
+    font-size:16px;
 }
 
-button {
-    border: 0;
-    border-radius: 12px;
-    padding: 12px 14px;
-    background: #111827;
-    color: white;
-    font-weight: 700;
-    font-size: 14px;
+textarea{
+    min-height:80px;
+    resize:vertical;
 }
 
-button.secondary {
-    background: #eef0f5;
-    color: #111827;
+button{
+    border:0;
+    border-radius:11px;
+    padding:12px 14px;
+    background:#111827;
+    color:white;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
 }
 
-button.danger {
-    background: #fee2e2;
-    color: #b91c1c;
+button.secondary{
+    background:#edf0f4;
+    color:#111827;
 }
 
-.actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 10px;
+button.danger{
+    background:#fee2e2;
+    color:#b91c1c;
 }
 
-.nav {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin: 14px 0;
+button.success{
+    background:#dcfce7;
+    color:#166534;
 }
 
-.nav button {
-    background: white;
-    color: #374151;
-    border: 1px solid #e5e7eb;
-    padding: 10px 4px;
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
 }
 
-.nav button.active {
-    background: #111827;
-    color: white;
+.hidden{
+    display:none !important;
 }
 
-.hidden {
-    display: none !important;
+.error{
+    min-height:20px;
+    margin-top:8px;
+    color:#dc2626;
+    font-size:13px;
 }
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    gap: 8px;
+.notice{
+    padding:11px;
+    border-radius:12px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    color:#9a3412;
+    font-size:13px;
 }
 
-.stat {
-    background: #f7f8fb;
-    padding: 12px;
-    border-radius: 14px;
+.lock-screen{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#f4f6f9;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
 }
 
-.stat span {
-    display: block;
-    font-size: 11px;
-    color: #6b7280;
+.lock-box{
+    width:min(420px,100%);
+    background:white;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 12px 45px rgba(0,0,0,.12);
 }
 
-.stat b {
-    display: block;
-    font-size: 18px;
-    margin-top: 4px;
+.lock-box h1{
+    text-align:center;
 }
 
-.row {
-    padding: 12px 0;
-    border-bottom: 1px solid #edf0f4;
+.lock-box .icon{
+    text-align:center;
+    font-size:45px;
+    margin-bottom:8px;
 }
 
-.row:last-child {
-    border-bottom: 0;
+.choice-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
 }
 
-.category-head,
-.expense {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+.choice{
+    min-height:150px;
+    text-align:left;
+    padding:20px;
+    background:white;
+    color:#111827;
+    border:1px solid #e1e5eb;
+    border-radius:18px;
 }
 
-.bar {
-    height: 8px;
-    background: #edf0f4;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 7px;
+.choice .emoji{
+    font-size:32px;
+    display:block;
+    margin-bottom:12px;
 }
 
-.fill {
-    height: 100%;
-    background: #6366f1;
+.choice strong{
+    display:block;
+    font-size:18px;
+    margin-bottom:6px;
 }
 
-.small {
-    font-size: 12px;
+.choice span{
+    color:#6b7280;
+    font-weight:400;
+    line-height:1.4;
 }
 
-.good {
-    color: #15803d;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
 }
 
-.bad {
-    color: #dc2626;
+.nav{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin:12px 0;
 }
 
-.empty {
-    text-align: center;
-    padding: 20px;
-    color: #6b7280;
+.nav button{
+    padding:10px 4px;
+    background:white;
+    color:#374151;
+    border:1px solid #e5e7eb;
 }
 
-.chip {
-    display: inline-block;
-    background: #eef0f5;
-    border-radius: 99px;
-    padding: 4px 7px;
-    font-size: 10px;
+.nav button.active{
+    background:#111827;
+    color:white;
 }
 
-.person {
-    display: grid;
-    grid-template-columns: 1fr 120px 35px;
-    gap: 6px;
-    margin: 7px 0;
+.stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
 }
 
-#lockScreen {
-    position: fixed;
-    inset: 0;
-    background: #f5f7fb;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+.stat{
+    background:#f7f8fa;
+    padding:13px;
+    border-radius:14px;
 }
 
-.lockBox {
-    width: min(420px,100%);
-    background: white;
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 10px 40px rgba(0,0,0,.12);
+.stat span{
+    display:block;
+    color:#6b7280;
+    font-size:11px;
 }
 
-.error {
-    color: #dc2626;
-    min-height: 20px;
-    font-size: 13px;
+.stat strong{
+    display:block;
+    margin-top:4px;
+    font-size:18px;
 }
 
-@media(max-width:520px) {
-    .grid {
-        grid-template-columns: 1fr;
+.row{
+    padding:12px 0;
+    border-bottom:1px solid #edf0f3;
+}
+
+.row:last-child{
+    border-bottom:0;
+}
+
+.row-flex{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.small{
+    font-size:12px;
+}
+
+.good{
+    color:#15803d;
+}
+
+.bad{
+    color:#dc2626;
+}
+
+.progress{
+    height:8px;
+    margin-top:8px;
+    background:#e9edf2;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    background:#6366f1;
+}
+
+.empty{
+    text-align:center;
+    padding:20px 10px;
+    color:#6b7280;
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#eef0f4;
+    font-size:10px;
+    font-weight:700;
+}
+
+.person-row{
+    display:grid;
+    grid-template-columns:1fr 38px;
+    gap:7px;
+    margin:7px 0;
+}
+
+.split-row{
+    display:grid;
+    grid-template-columns:1.2fr 1fr;
+    gap:8px;
+    margin:7px 0;
+}
+
+.group-card{
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:13px;
+    margin-top:10px;
+}
+
+.balance-positive{
+    color:#15803d;
+    font-weight:700;
+}
+
+.balance-negative{
+    color:#dc2626;
+    font-weight:700;
+}
+
+@media(max-width:520px){
+
+    .grid,
+    .choice-grid{
+        grid-template-columns:1fr;
     }
 
-    .person {
-        grid-template-columns: 1fr 100px 35px;
+    .grid-3{
+        grid-template-columns:1fr 1fr;
     }
+
+    .nav{
+        grid-template-columns:repeat(4,1fr);
+    }
+
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- SECURITY SCREEN -->
+<!-- ============================================================
+     PIN LOCK
+============================================================ -->
 
-<div id="lockScreen">
+<div id="lockScreen" class="lock-screen">
 
-<div class="lockBox">
+    <div class="lock-box">
 
-<h2>🔒 My Budget</h2>
+        <div class="icon">🔒</div>
 
-<p class="muted">
-Your expense data is stored locally on this device.
-</p>
+        <h1>My Budget</h1>
 
-<div id="pinSetup">
+        <p class="muted" style="text-align:center">
+            Private INR expense tracker
+        </p>
 
-<label>CREATE APP PIN</label>
+        <!-- FIRST TIME PIN SETUP -->
 
-<input
-    id="pin1"
-    type="password"
-    inputmode="numeric"
-    maxlength="8"
-    placeholder="4–8 digits">
+        <div id="pinSetup">
 
-<br><br>
+            <label>CREATE PIN</label>
 
-<label>CONFIRM PIN</label>
+            <input
+                id="createPinInput"
+                type="password"
+                inputmode="numeric"
+                maxlength="8"
+                autocomplete="off"
+            >
 
-<input
-    id="pin2"
-    type="password"
-    inputmode="numeric"
-    maxlength="8">
+            <br>
 
-<button
-    style="width:100%;margin-top:12px"
-    onclick="createPIN()">
+            <label>CONFIRM PIN</label>
 
-Enable App Lock
+            <input
+                id="confirmPinInput"
+                type="password"
+                inputmode="numeric"
+                maxlength="8"
+                autocomplete="off"
+            >
 
-</button>
+            <button
+                style="width:100%;margin-top:12px"
+                onclick="createPIN()"
+            >
+                Enable App Lock
+            </button>
 
-</div>
+        </div>
 
-<div id="pinLogin" class="hidden">
+        <!-- EXISTING PIN LOGIN -->
 
-<label>ENTER APP PIN</label>
+        <div id="pinLogin" class="hidden">
 
-<input
-    id="pinInput"
-    type="password"
-    inputmode="numeric"
-    maxlength="8">
+            <label>ENTER PIN</label>
 
-<button
-    style="width:100%;margin-top:12px"
-    onclick="unlockApp()">
+            <input
+                id="loginPinInput"
+                type="password"
+                inputmode="numeric"
+                maxlength="8"
+                autocomplete="off"
+            >
 
-Unlock
+            <button
+                style="width:100%;margin-top:12px"
+                onclick="unlockApp()"
+            >
+                Unlock
+            </button>
 
-</button>
+        </div>
 
-</div>
+        <div
+            id="pinError"
+            class="error"
+        ></div>
 
-<div id="pinError" class="error"></div>
-
-<p class="small muted">
-Keep your PIN private.
-</p>
-
-</div>
-
-</div>
-
-
-<div class="container">
-
-<h1>My Budget</h1>
-
-<div class="muted">
-Personal expense tracker · INR
-</div>
-
-
-<!-- NAVIGATION -->
-
-<div class="nav">
-
-<button
-id="navDashboard"
-onclick="showTab('dashboard')">
-
-Dashboard
-
-</button>
-
-<button
-id="navExpense"
-onclick="showTab('expense')">
-
-+ Expense
-
-</button>
-
-<button
-id="navHistory"
-onclick="showTab('history')">
-
-History
-
-</button>
-
-<button
-id="navData"
-onclick="showTab('data')">
-
-Data
-
-</button>
+    </div>
 
 </div>
 
 
-<!-- DASHBOARD -->
+<!-- ============================================================
+     APPLICATION
+============================================================ -->
 
-<section id="dashboard">
+<div id="app" class="app hidden">
 
-<div class="card">
+    <div class="topbar">
 
-<div class="grid">
+        <div>
+            <h1>My Budget</h1>
+            <div class="muted">
+                INR Expense Tracker
+            </div>
+        </div>
 
-<div>
+        <button
+            class="secondary"
+            onclick="lockApp()"
+        >
+            🔒 Lock
+        </button>
 
-<label>MONTH</label>
+    </div>
 
-<input
-id="month"
-type="month">
 
-</div>
+    <!-- ========================================================
+         TRACKER SELECTION
+    ========================================================= -->
 
-<div>
+    <section id="trackerSelection">
 
-<label>ITERATION</label>
+        <div class="card">
 
-<select id="iteration"></select>
+            <h2>Choose Tracker</h2>
 
-</div>
+            <p class="muted">
+                Select what you want to manage.
+            </p>
 
-</div>
+            <div class="choice-grid">
 
+                <button
+                    class="choice"
+                    onclick="openPersonalBudget()"
+                >
 
-<div class="actions">
+                    <span class="emoji">💰</span>
 
-<button onclick="createIteration()">
-+ New Iteration
-</button>
+                    <strong>
+                        Personal Budget
+                    </strong>
 
-<button
-class="secondary"
-onclick="renameIteration()">
+                    <span>
+                        Manage your salary,
+                        monthly budget,
+                        personal expenses
+                        and savings allocation.
+                    </span>
 
-Rename
+                </button>
 
-</button>
 
-<button
-class="danger"
-onclick="deleteIteration()">
+                <button
+                    class="choice"
+                    onclick="openSharedExpenses()"
+                >
 
-Delete
+                    <span class="emoji">👥</span>
 
-</button>
+                    <strong>
+                        Shared Expenses
+                    </strong>
 
-</div>
+                    <span>
+                        Create groups,
+                        split expenses,
+                        track balances
+                        and settle debts.
+                    </span>
 
-</div>
+                </button>
 
+            </div>
 
-<div class="card">
+        </div>
 
-<div class="grid">
+    </section>
 
-<div>
 
-<label>SALARY (₹)</label>
+    <!-- ========================================================
+         PERSONAL BUDGET
+    ========================================================= -->
 
-<input
-id="salary"
-type="number"
-min="0"
-onchange="saveSalary()">
+    <section
+        id="personalBudget"
+        class="hidden"
+    >
 
-</div>
+        <div class="actions">
 
-<div>
+            <button
+                class="secondary"
+                onclick="returnToTrackers()"
+            >
+                ← Trackers
+            </button>
 
-<label>ITERATION</label>
+        </div>
 
-<input
-id="iterationName"
-disabled>
 
-</div>
+        <div class="nav">
 
-</div>
+            <button
+                id="personalNavDashboard"
+                onclick="showPersonalTab('dashboard')"
+            >
+                Dashboard
+            </button>
 
-</div>
+            <button
+                id="personalNavExpense"
+                onclick="showPersonalTab('expense')"
+            >
+                + Expense
+            </button>
 
+            <button
+                id="personalNavHistory"
+                onclick="showPersonalTab('history')"
+            >
+                History
+            </button>
 
-<div class="card">
+            <button
+                id="personalNavData"
+                onclick="showPersonalTab('data')"
+            >
+                Data
+            </button>
 
-<div class="stats">
+        </div>
 
-<div class="stat">
 
-<span>Salary</span>
+        <!-- PERSONAL DASHBOARD -->
 
-<b id="statSalary">
-₹0
-</b>
+        <div
+            id="personalDashboard"
+            class="personal-tab"
+        >
 
-</div>
+            <div class="card">
 
-<div class="stat">
+                <h2>Monthly Budget</h2>
 
-<span>Budgeted</span>
+                <div class="grid">
 
-<b id="statBudget">
-₹0
-</b>
+                    <div>
 
-</div>
+                        <label>
+                            MONTH
+                        </label>
 
-<div class="stat">
+                        <input
+                            id="personalMonth"
+                            type="month"
+                            onchange="changePersonalMonth()"
+                        >
 
-<span>Your actual</span>
+                    </div>
 
-<b id="statActual">
-₹0
-</b>
 
-</div>
+                    <div>
 
-<div class="stat">
+                        <label>
+                            ITERATION
+                        </label>
 
-<span>Remaining</span>
+                        <select
+                            id="personalIteration"
+                            onchange="changePersonalIteration()"
+                        ></select>
 
-<b id="statRemaining">
-₹0
-</b>
+                    </div>
 
-</div>
+                </div>
 
-</div>
 
-</div>
+                <div class="actions">
 
+                    <button
+                        onclick="createPersonalIteration()"
+                    >
+                        + New Iteration
+                    </button>
 
-<div class="card">
+                    <button
+                        class="secondary"
+                        onclick="renamePersonalIteration()"
+                    >
+                        Rename
+                    </button>
 
-<h2>Budget vs Actual</h2>
+                    <button
+                        class="danger"
+                        onclick="deletePersonalIteration()"
+                    >
+                        Delete
+                    </button>
 
-<div id="categoryView"></div>
+                </div>
 
-</div>
+            </div>
 
 
-<div class="card">
+            <div class="card">
 
-<h2>Recent Expenses</h2>
+                <label>
+                    TOTAL MONTHLY SALARY
+                </label>
 
-<div id="recentExpenses"></div>
+                <input
+                    id="personalSalary"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="₹ 0"
+                    onchange="savePersonalSalary()"
+                >
 
-</div>
+            </div>
 
-</section>
 
+            <div class="card">
 
-<!-- ADD EXPENSE -->
+                <div class="stat-grid">
 
-<section
-id="expense"
-class="hidden">
+                    <div class="stat">
 
-<div class="card">
+                        <span>
+                            Salary
+                        </span>
 
-<h2 id="expenseFormTitle">
-Add Expense
-</h2>
+                        <strong id="personalSalaryStat">
+                            ₹0
+                        </strong>
 
+                    </div>
 
-<div class="grid">
 
-<div>
+                    <div class="stat">
 
-<label>AMOUNT (₹)</label>
+                        <span>
+                            Budgeted
+                        </span>
 
-<input
-id="expenseAmount"
-type="number"
-min="0">
+                        <strong id="personalBudgetStat">
+                            ₹0
+                        </strong>
 
-</div>
+                    </div>
 
-<div>
 
-<label>DATE</label>
+                    <div class="stat">
 
-<input
-id="expenseDate"
-type="date">
+                        <span>
+                            Actual
+                        </span>
 
-</div>
+                        <strong id="personalActualStat">
+                            ₹0
+                        </strong>
 
-</div>
+                    </div>
 
 
-<div style="margin-top:10px">
+                    <div class="stat">
 
-<label>CATEGORY</label>
+                        <span>
+                            Remaining
+                        </span>
 
-<select id="expenseCategory"></select>
+                        <strong id="personalRemainingStat">
+                            ₹0
+                        </strong>
 
-</div>
+                    </div>
 
+                </div>
 
-<div style="margin-top:10px">
+            </div>
 
-<label>PAYMENT METHOD</label>
 
-<select id="paymentMethod">
+            <div class="card">
 
-<option>UPI</option>
-<option>Cash</option>
-<option>Debit Card</option>
-<option>Credit Card</option>
-<option>Bank Transfer</option>
+                <h2>
+                    Budget vs Actual
+                </h2>
 
-</select>
+                <div id="personalCategories"></div>
 
-</div>
+            </div>
 
+        </div>
 
-<div style="margin-top:10px">
 
-<label>EXPENSE TYPE</label>
+        <!-- PERSONAL ADD EXPENSE -->
 
-<select
-id="expenseType"
-onchange="toggleShared()">
+        <div
+            id="personalExpense"
+            class="personal-tab hidden"
+        >
 
-<option value="personal">
-Personal
-</option>
+            <div class="card">
 
-<option value="shared">
-Shared
-</option>
+                <h2 id="personalExpenseTitle">
+                    Add Expense
+                </h2>
 
-</select>
+                <div class="grid">
 
-</div>
+                    <div>
 
+                        <label>
+                            AMOUNT (₹)
+                        </label>
 
-<!-- SHARED EXPENSE -->
+                        <input
+                            id="personalExpenseAmount"
+                            type="number"
+                            min="0"
+                            step="1"
+                        >
 
-<div
-id="sharedPanel"
-class="hidden">
+                    </div>
 
-<label>CONTRIBUTORS</label>
 
-<div id="contributors"></div>
+                    <div>
 
-<button
-class="secondary"
-onclick="addContributor()">
+                        <label>
+                            DATE
+                        </label>
 
-+ Add Person
+                        <input
+                            id="personalExpenseDate"
+                            type="date"
+                        >
 
-</button>
+                    </div>
 
-<div
-class="small"
-style="margin-top:8px">
+                </div>
 
-Contributor amounts must equal
-the group expense.
 
-</div>
+                <div style="margin-top:10px">
 
-<b id="contributorTotal">
-Total: ₹0
-</b>
+                    <label>
+                        CATEGORY
+                    </label>
 
-</div>
+                    <select
+                        id="personalExpenseCategory"
+                    ></select>
 
+                </div>
 
-<div style="margin-top:10px">
 
-<label>DESCRIPTION</label>
+                <div style="margin-top:10px">
 
-<input
-id="expenseDescription"
-placeholder="e.g. Hotel booking">
+                    <label>
+                        PAYMENT METHOD
+                    </label>
 
-</div>
+                    <select
+                        id="personalExpensePayment"
+                    >
 
+                        <option>
+                            UPI
+                        </option>
 
-<div class="actions">
+                        <option>
+                            Cash
+                        </option>
 
-<button onclick="saveExpense()">
-Save Expense
-</button>
+                        <option>
+                            Debit Card
+                        </option>
 
-<button
-class="secondary"
-onclick="clearExpenseForm()">
+                        <option>
+                            Credit Card
+                        </option>
 
-Clear
+                        <option>
+                            Bank Transfer
+                        </option>
 
-</button>
+                        <option>
+                            Other
+                        </option>
 
-</div>
+                    </select>
 
-</div>
+                </div>
 
-</section>
 
+                <div style="margin-top:10px">
 
-<!-- HISTORY -->
+                    <label>
+                        DESCRIPTION
+                    </label>
 
-<section
-id="history"
-class="hidden">
+                    <input
+                        id="personalExpenseDescription"
+                        placeholder="Optional"
+                    >
 
-<div class="card">
+                </div>
 
-<h2>Expense History</h2>
 
+                <div class="actions">
 
-<div class="grid">
+                    <button
+                        onclick="savePersonalExpense()"
+                    >
+                        Save Expense
+                    </button>
 
-<div>
+                    <button
+                        class="secondary"
+                        onclick="clearPersonalExpenseForm()"
+                    >
+                        Clear
+                    </button>
 
-<label>CATEGORY</label>
+                </div>
 
-<select
-id="filterCategory"
-onchange="renderHistory()">
+            </div>
 
-<option value="">
-All
-</option>
+        </div>
 
-</select>
 
-</div>
+        <!-- PERSONAL HISTORY -->
 
+        <div
+            id="personalHistory"
+            class="personal-tab hidden"
+        >
 
-<div>
+            <div class="card">
 
-<label>SEARCH</label>
+                <h2>
+                    Expense History
+                </h2>
 
-<input
-id="searchExpense"
-oninput="renderHistory()"
-placeholder="Search">
+                <div class="grid">
 
-</div>
+                    <div>
 
-</div>
+                        <label>
+                            CATEGORY
+                        </label>
 
+                        <select
+                            id="personalHistoryFilter"
+                            onchange="renderPersonalHistory()"
+                        >
 
-<div id="historyList"></div>
+                            <option value="">
+                                All
+                            </option>
 
-</div>
+                        </select>
 
-</section>
+                    </div>
 
 
-<!-- DATA -->
+                    <div>
 
-<section
-id="data"
-class="hidden">
+                        <label>
+                            SEARCH
+                        </label>
 
-<div class="card">
+                        <input
+                            id="personalHistorySearch"
+                            oninput="renderPersonalHistory()"
+                            placeholder="Search..."
+                        >
 
-<h2>Data & Backup</h2>
+                    </div>
 
-<p class="small muted">
+                </div>
 
-CSV files are readable in Excel,
-Numbers and Google Sheets.
 
-You can also import a CSV previously
-exported by this app.
+                <div id="personalExpenseList"></div>
 
-</p>
+            </div>
 
+        </div>
 
-<div class="actions">
 
-<button onclick="exportCSV()">
-📊 Export CSV
-</button>
+        <!-- PERSONAL DATA -->
 
-<button
-class="secondary"
-onclick="document.getElementById('csvFile').click()">
+        <div
+            id="personalData"
+            class="personal-tab hidden"
+        >
 
-📥 Import CSV
+            <div class="card">
 
-</button>
+                <h2>
+                    Personal Data
+                </h2>
 
-</div>
+                <p class="muted">
+                    Export your personal budget
+                    and expenses as CSV.
+                </p>
 
+                <div class="actions">
 
-<input
-id="csvFile"
-type="file"
-accept=".csv"
-class="hidden"
-onchange="importCSV(event)">
+                    <button
+                        onclick="exportPersonalCSV()"
+                    >
+                        📊 Export CSV
+                    </button>
 
+                    <button
+                        class="secondary"
+                        onclick="document.getElementById('personalCSVInput').click()"
+                    >
+                        📥 Import CSV
+                    </button>
 
-<div class="actions">
+                </div>
 
-<button onclick="exportEncryptedBackup()">
-🔐 Encrypted Backup
-</button>
+                <input
+                    id="personalCSVInput"
+                    type="file"
+                    accept=".csv"
+                    class="hidden"
+                    onchange="importPersonalCSV(event)"
+                >
 
-<button
-class="secondary"
-onclick="document.getElementById('backupFile').click()">
+            </div>
 
-🔐 Restore Backup
+        </div>
 
-</button>
+    </section>
 
-</div>
 
+    <!-- ========================================================
+         SHARED EXPENSES
+    ========================================================= -->
 
-<input
-id="backupFile"
-type="file"
-accept=".mbbackup"
-class="hidden"
-onchange="importEncryptedBackup(event)">
+    <section
+        id="sharedExpenses"
+        class="hidden"
+    >
 
+        <div class="actions">
 
-<p class="small muted">
+            <button
+                class="secondary"
+                onclick="returnToTrackers()"
+            >
+                ← Trackers
+            </button>
 
-Encrypted backups require a separate
-backup password.
+        </div>
 
-</p>
 
-</div>
+        <div class="nav">
 
-</section>
+            <button
+                id="sharedNavGroups"
+                onclick="showSharedTab('groups')"
+            >
+                Groups
+            </button>
+
+            <button
+                id="sharedNavExpense"
+                onclick="showSharedTab('expense')"
+            >
+                + Expense
+            </button>
+
+            <button
+                id="sharedNavBalances"
+                onclick="showSharedTab('balances')"
+            >
+                Balances
+            </button>
+
+            <button
+                id="sharedNavData"
+                onclick="showSharedTab('data')"
+            >
+                Data
+            </button>
+
+        </div>
+
+
+        <!-- ====================================================
+             SHARED GROUPS
+        ==================================================== -->
+
+        <div
+            id="sharedGroups"
+            class="shared-tab"
+        >
+
+            <div class="card">
+
+                <h2>
+                    Shared Groups
+                </h2>
+
+                <p class="muted">
+                    Create a separate space for
+                    trips, housing, events,
+                    relationships or outings.
+                </p>
+
+                <div class="grid">
+
+                    <div>
+
+                        <label>
+                            GROUP NAME
+                        </label>
+
+                        <input
+                            id="sharedGroupName"
+                            placeholder="e.g. Goa Trip"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label>
+                            DESCRIPTION
+                        </label>
+
+                        <input
+                            id="sharedGroupDescription"
+                            placeholder="Optional"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <button
+                        onclick="createSharedGroup()"
+                    >
+                        + Create Group
+                    </button>
+
+                </div>
+
+
+                <div id="sharedGroupList"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             SHARED ADD EXPENSE
+        ==================================================== -->
+
+        <div
+            id="sharedExpense"
+            class="shared-tab hidden"
+        >
+
+            <div class="card">
+
+                <h2 id="sharedExpenseTitle">
+                    Add Shared Expense
+                </h2>
+
+
+                <label>
+                    GROUP
+                </label>
+
+                <select
+                    id="sharedExpenseGroup"
+                    onchange="loadSharedGroupPeople()"
+                ></select>
+
+
+                <div
+                    id="sharedNoGroupMessage"
+                    class="notice hidden"
+                    style="margin-top:10px"
+                >
+                    Create a group first before
+                    adding a shared expense.
+                </div>
+
+
+                <div
+                    id="sharedExpenseForm"
+                    class="hidden"
+                >
+
+                    <div
+                        class="grid"
+                        style="margin-top:10px"
+                    >
+
+                        <div>
+
+                            <label>
+                                AMOUNT (₹)
+                            </label>
+
+                            <input
+                                id="sharedExpenseAmount"
+                                type="number"
+                                min="0"
+                                step="1"
+                                placeholder="₹ 0"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                DATE
+                            </label>
+
+                            <input
+                                id="sharedExpenseDate"
+                                type="date"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div style="margin-top:10px">
+
+                        <label>
+                            CATEGORY
+                        </label>
+
+                        <input
+                            id="sharedExpenseCategory"
+                            placeholder="Food, Hotel, Rent..."
+                        >
+
+                    </div>
+
+
+                    <div style="margin-top:10px">
+
+                        <label>
+                            PAID BY
+                        </label>
+
+                        <select
+                            id="sharedExpensePaidBy"
+                        ></select>
+
+                    </div>
+
+
+                    <div style="margin-top:10px">
+
+                        <label>
+                            SPLIT METHOD
+                        </label>
+
+                        <select
+                            id="sharedSplitMethod"
+                            onchange="renderSharedSplitRows()"
+                        >
+
+                            <option value="equal">
+                                Equal
+                            </option>
+
+                            <option value="amount">
+                                Exact Amounts
+                            </option>
+
+                            <option value="percentage">
+                                Percentages
+                            </option>
+
+                            <option value="shares">
+                                Shares
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        id="sharedSplitRows"
+                        style="margin-top:10px"
+                    ></div>
+
+
+                    <div
+                        id="sharedSplitSummary"
+                        class="small muted"
+                    ></div>
+
+
+                    <div style="margin-top:10px">
+
+                        <label>
+                            COMMENT
+                        </label>
+
+                        <textarea
+                            id="sharedExpenseComment"
+                            placeholder="Optional note about this expense"
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="actions">
+
+                        <button
+                            onclick="saveSharedExpense()"
+                        >
+                            Save Expense
+                        </button>
+
+                        <button
+                            class="secondary"
+                            onclick="clearSharedExpenseForm()"
+                        >
+                            Clear
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             SHARED BALANCES
+        ==================================================== -->
+
+        <div
+            id="sharedBalances"
+            class="shared-tab hidden"
+        >
+
+            <div class="card">
+
+                <h2>
+                    Balances
+                </h2>
+
+                <label>
+                    GROUP
+                </label>
+
+                <select
+                    id="balanceGroup"
+                    onchange="renderSharedBalances()"
+                ></select>
+
+
+                <div
+                    id="sharedBalanceList"
+                    style="margin-top:10px"
+                ></div>
+
+
+                <h3>
+                    Suggested Settlements
+                </h3>
+
+                <div
+                    id="simplifiedDebts"
+                ></div>
+
+
+                <h3>
+                    Settlement History
+                </h3>
+
+                <div
+                    id="settlementHistory"
+                ></div>
+
+
+                <div class="actions">
+
+                    <button
+                        onclick="recordSharedSettlement()"
+                    >
+                        + Record Settlement
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             SHARED DATA
+        ==================================================== -->
+
+        <div
+            id="sharedData"
+            class="shared-tab hidden"
+        >
+
+            <div class="card">
+
+                <h2>
+                    Shared Data
+                </h2>
+
+                <p class="muted">
+                    Export or import shared-expense
+                    records using CSV.
+                </p>
+
+
+                <label>
+                    GROUP
+                </label>
+
+                <select
+                    id="sharedDataGroup"
+                ></select>
+
+
+                <div class="actions">
+
+                    <button
+                        onclick="exportSharedCSV()"
+                    >
+                        📊 Export CSV
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="document.getElementById('sharedCSVInput').click()"
+                    >
+                        📥 Import CSV
+                    </button>
+
+                </div>
+
+
+                <input
+                    id="sharedCSVInput"
+                    type="file"
+                    accept=".csv"
+                    class="hidden"
+                    onchange="importSharedCSV(event)"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
 
 </div>
 
 
 <script>
 
-/* ==============================
-   BUDGET SETTINGS
-============================== */
+/* ================================================================
+   APPLICATION DATA
+================================================================ */
 
-const CATEGORIES = [
+const PERSONAL_CATEGORIES = [
 
-["Home Expenses",35],
+    {
+        name:"Home Expenses",
+        percentage:35
+    },
 
-["Vehicle Expenses",15],
+    {
+        name:"Vehicle Expenses",
+        percentage:15
+    },
 
-["Investments",25],
+    {
+        name:"Investments",
+        percentage:25
+    },
 
-["Entertainment",15],
+    {
+        name:"Entertainment",
+        percentage:15
+    },
 
-["Buffer Fund",10]
+    {
+        name:"Buffer Fund",
+        percentage:10
+    }
 
 ];
 
 
-const DB_KEY = "myBudgetDatabaseV1";
+const STORAGE_KEY =
+    "my_budget_version_2";
 
-const PIN_KEY = "myBudgetPIN";
 
-let database =
-JSON.parse(
-localStorage.getItem(DB_KEY)
-||
-'{"months":{}}'
-);
+let appData =
+    loadAppData();
 
-let currentMonth =
-new Date()
-.toISOString()
-.slice(0,7);
 
-let currentIteration = "";
+let currentPersonalMonth =
+    getCurrentMonth();
 
-let editingExpenseId = null;
 
+let currentPersonalIteration =
+    "Default";
 
-/* ==============================
-   INITIALIZE
-============================== */
 
-CATEGORIES.forEach(category => {
+let editingPersonalExpenseId =
+    null;
 
-document.getElementById(
-"expenseCategory"
-).innerHTML +=
 
-`<option>${category[0]}</option>`;
+let editingSharedExpenseId =
+    null;
 
-document.getElementById(
-"filterCategory"
-).innerHTML +=
 
-`<option>${category[0]}</option>`;
+/* ================================================================
+   BASIC HELPERS
+================================================================ */
 
-});
+function getCurrentMonth(){
 
+    return new Date()
+        .toISOString()
+        .slice(0,7);
 
-function ensureMonth(month) {
-
-if (!database.months[month]) {
-
-database.months[month] = {
-
-iterations: {
-
-Default: {
-
-salary:0,
-
-expenses:[]
-
-}
-
-}
-
-};
-
 }
 
-return database.months[month];
 
-}
-
+function today(){
 
-function currentData() {
+    return new Date()
+        .toISOString()
+        .slice(0,10);
 
-return ensureMonth(currentMonth)
-.iterations[currentIteration];
-
 }
 
 
-function saveDatabase() {
+function money(value){
 
-localStorage.setItem(
-DB_KEY,
-JSON.stringify(database)
-);
+    return new Intl.NumberFormat(
+        "en-IN",
+        {
+            style:"currency",
+            currency:"INR",
+            maximumFractionDigits:0
+        }
+    ).format(
+        Number(value) || 0
+    );
 
 }
-
 
-/* ==============================
-   FORMATTING
-============================== */
 
-function INR(value) {
+function escapeHTML(value){
 
-return new Intl.NumberFormat(
-"en-IN",
-{
-style:"currency",
-currency:"INR",
-maximumFractionDigits:0
-}
-).format(Number(value)||0);
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 
 }
 
 
-function escapeHTML(value) {
+function saveAppData(){
 
-return String(value ?? "")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(appData)
+    );
 
 }
-
-
-/* ==============================
-   NAVIGATION
-============================== */
-
-function showTab(tab) {
 
-["dashboard","expense","history","data"]
-.forEach(id => {
 
-document.getElementById(id)
-.classList.toggle(
-"hidden",
-id !== tab
-);
+function loadAppData(){
 
-});
+    try{
 
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
 
-["Dashboard","Expense","History","Data"]
-.forEach(name => {
+        if(saved){
 
-document.getElementById(
-"nav"+name
-).classList.toggle(
-"active",
-name.toLowerCase() === tab
-);
+            return JSON.parse(saved);
 
-});
+        }
 
-}
+    }catch(error){
 
+        console.error(error);
 
-/* ==============================
-   MONTHS / ITERATIONS
-============================== */
+    }
 
-function loadIterations() {
 
-let monthData =
-ensureMonth(currentMonth);
+    return {
 
-let names =
-Object.keys(
-monthData.iterations
-);
+        personal:{
+            months:{}
+        },
 
-if (
-!currentIteration ||
-!monthData.iterations[currentIteration]
-) {
+        shared:{
+            groups:{}
+        }
 
-currentIteration = names[0];
+    };
 
 }
-
-let select =
-document.getElementById("iteration");
 
-select.innerHTML =
-names.map(name =>
-`<option value="${escapeHTML(name)}">
-${escapeHTML(name)}
-</option>`
-).join("");
 
-select.value =
-currentIteration;
-
-}
+function ensurePersonalMonth(month){
 
+    if(
+        !appData.personal.months[month]
+    ){
 
-document.getElementById(
-"month"
-).addEventListener(
-"change",
-function() {
+        appData.personal.months[month] = {
 
-currentMonth = this.value;
+            iterations:{
 
-currentIteration = "";
+                Default:{
 
-loadIterations();
+                    salary:0,
 
-render();
+                    expenses:[]
 
-});
+                }
 
+            }
 
-document.getElementById(
-"iteration"
-).addEventListener(
-"change",
-function() {
+        };
 
-currentIteration =
-this.value;
+    }
 
-render();
 
-});
+    return appData.personal.months[month];
 
+}
 
-function createIteration() {
 
-let name =
-prompt(
-"Enter an iteration name:"
-);
+function getPersonalIteration(){
 
-if (!name) return;
+    const monthData =
+        ensurePersonalMonth(
+            currentPersonalMonth
+        );
 
-name = name.trim();
 
-if (!name) return;
+    if(
+        !monthData.iterations[
+            currentPersonalIteration
+        ]
+    ){
 
-let monthData =
-ensureMonth(currentMonth);
+        currentPersonalIteration =
+            Object.keys(
+                monthData.iterations
+            )[0] || "Default";
 
-if (monthData.iterations[name]) {
+    }
 
-alert(
-"That iteration already exists."
-);
 
-return;
+    return monthData.iterations[
+        currentPersonalIteration
+    ];
 
 }
-
-monthData.iterations[name] = {
 
-salary:0,
 
-expenses:[]
+/* ================================================================
+   PIN LOCK
+================================================================ */
 
-};
+async function hashPIN(pin){
 
-currentIteration = name;
+    const data =
+        new TextEncoder().encode(pin);
 
-saveDatabase();
+    const hash =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
 
-loadIterations();
+    return Array
+        .from(new Uint8Array(hash))
+        .map(
+            byte =>
+                byte
+                    .toString(16)
+                    .padStart(2,"0")
+        )
+        .join("");
 
-render();
-
 }
-
 
-function renameIteration() {
 
-let newName =
-prompt(
-"New iteration name:",
-currentIteration
-);
+async function createPIN(){
 
-if (!newName) return;
+    const pin =
+        document.getElementById(
+            "createPinInput"
+        ).value;
 
-newName = newName.trim();
+    const confirm =
+        document.getElementById(
+            "confirmPinInput"
+        ).value;
 
-if (
-!newName ||
-newName === currentIteration
-) return;
 
-let monthData =
-ensureMonth(currentMonth);
+    if(!/^\d{4,8}$/.test(pin)){
 
-if (monthData.iterations[newName]) {
+        showPINError(
+            "PIN must contain 4–8 digits."
+        );
 
-alert(
-"That name already exists."
-);
+        return;
 
-return;
+    }
 
-}
-
-monthData.iterations[newName] =
-monthData.iterations[currentIteration];
 
-delete monthData.iterations[currentIteration];
+    if(pin !== confirm){
 
-currentIteration = newName;
+        showPINError(
+            "The PINs do not match."
+        );
 
-saveDatabase();
+        return;
 
-loadIterations();
+    }
 
-render();
-
-}
 
+    const hash =
+        await hashPIN(pin);
 
-function deleteIteration() {
 
-let monthData =
-ensureMonth(currentMonth);
+    localStorage.setItem(
+        "my_budget_pin_hash",
+        hash
+    );
 
-let names =
-Object.keys(
-monthData.iterations
-);
 
-if (names.length === 1) {
+    sessionStorage.setItem(
+        "my_budget_unlocked",
+        "true"
+    );
 
-alert(
-"At least one iteration must remain."
-);
 
-return;
+    showApplication();
 
 }
 
-if (
-confirm(
-"Delete this iteration and all its expenses?"
-)
-) {
 
-delete monthData.iterations[
-currentIteration
-];
+async function unlockApp(){
 
-currentIteration =
-Object.keys(
-monthData.iterations
-)[0];
+    const pin =
+        document.getElementById(
+            "loginPinInput"
+        ).value;
 
-saveDatabase();
 
-loadIterations();
+    const savedHash =
+        localStorage.getItem(
+            "my_budget_pin_hash"
+        );
 
-render();
 
-}
+    const enteredHash =
+        await hashPIN(pin);
 
-}
 
+    if(
+        savedHash &&
+        enteredHash === savedHash
+    ){
 
-/* ==============================
-   SALARY
-============================== */
+        sessionStorage.setItem(
+            "my_budget_unlocked",
+            "true"
+        );
 
-function saveSalary() {
+        showApplication();
 
-currentData().salary =
-Number(
-document.getElementById("salary").value
-)||0;
+    }else{
 
-saveDatabase();
+        showPINError(
+            "Incorrect PIN."
+        );
 
-render();
+    }
 
 }
-
-
-/* ==============================
-   DASHBOARD
-============================== */
-
-function render() {
-
-let data = currentData();
-
-let salary =
-Number(data.salary)||0;
-
-let actual =
-data.expenses.reduce(
-(sum,expense) =>
-sum +
-(
-expense.yourContribution ??
-expense.amount
-),
-0
-);
 
 
-document.getElementById(
-"salary"
-).value =
-data.salary || "";
+function showPINError(message){
 
-document.getElementById(
-"iterationName"
-).value =
-currentIteration;
+    document.getElementById(
+        "pinError"
+    ).textContent = message;
 
-
-document.getElementById(
-"statSalary"
-).textContent =
-INR(salary);
-
-document.getElementById(
-"statBudget"
-).textContent =
-INR(salary);
-
-document.getElementById(
-"statActual"
-).textContent =
-INR(actual);
+}
 
-document.getElementById(
-"statRemaining"
-).textContent =
-INR(salary-actual);
 
+function showApplication(){
 
-renderCategories();
+    document.getElementById(
+        "lockScreen"
+    ).classList.add("hidden");
 
-renderRecentExpenses();
 
-renderHistory();
+    document.getElementById(
+        "app"
+    ).classList.remove("hidden");
 
 }
 
 
-function renderCategories() {
+function lockApp(){
 
-let data = currentData();
+    sessionStorage.removeItem(
+        "my_budget_unlocked"
+    );
 
-let salary =
-Number(data.salary)||0;
 
-let html = "";
+    document.getElementById(
+        "app"
+    ).classList.add("hidden");
 
-CATEGORIES.forEach(
-category => {
 
-let name =
-category[0];
+    document.getElementById(
+        "lockScreen"
+    ).classList.remove("hidden");
 
-let percentage =
-category[1];
 
-let budget =
-salary *
-percentage /
-100;
+    document.getElementById(
+        "loginPinInput"
+    ).value = "";
 
-let actual =
-data.expenses
-.filter(
-expense =>
-expense.category === name
-)
-.reduce(
-(sum,expense) =>
-sum +
-(
-expense.yourContribution ??
-expense.amount
-),
-0
-);
+}
 
-let difference =
-budget-actual;
 
-let percentageUsed =
-budget
-? Math.min(
-100,
-actual/budget*100
-)
-:0;
+/* ================================================================
+   TRACKER NAVIGATION
+================================================================ */
 
+function openPersonalBudget(){
 
-html += `
+    document.getElementById(
+        "trackerSelection"
+    ).classList.add("hidden");
 
-<div class="row">
 
-<div class="category-head">
+    document.getElementById(
+        "personalBudget"
+    ).classList.remove("hidden");
 
-<div>
 
-<b>
-${escapeHTML(name)}
-</b>
+    document.getElementById(
+        "sharedExpenses"
+    ).classList.add("hidden");
 
-<div class="small muted">
 
-${percentage}%
-· Budget ${INR(budget)}
+    initialisePersonalBudget();
 
-</div>
+}
 
-</div>
 
-<div style="text-align:right">
+function openSharedExpenses(){
 
-<b>
-${INR(actual)}
-</b>
+    document.getElementById(
+        "trackerSelection"
+    ).classList.add("hidden");
 
-<div class="small
-${difference >= 0
-? "good"
-: "bad"}">
 
-${difference >= 0
-? INR(difference)+" remaining"
-: INR(-difference)+" over"}
+    document.getElementById(
+        "personalBudget"
+    ).classList.add("hidden");
 
-</div>
 
-</div>
+    document.getElementById(
+        "sharedExpenses"
+    ).classList.remove("hidden");
 
-</div>
 
-<div class="bar">
+    initialiseSharedExpenses();
 
-<div
-class="fill"
-style="width:${percentageUsed}%">
+}
 
-</div>
 
-</div>
+function returnToTrackers(){
 
-</div>
+    document.getElementById(
+        "personalBudget"
+    ).classList.add("hidden");
 
-`;
 
-});
+    document.getElementById(
+        "sharedExpenses"
+    ).classList.add("hidden");
 
 
-document.getElementById(
-"categoryView"
-).innerHTML =
-html;
+    document.getElementById(
+        "trackerSelection"
+    ).classList.remove("hidden");
 
 }
-
 
-/* ==============================
-   EXPENSES
-============================== */
 
-function toggleShared() {
+/* ================================================================
+   PERSONAL TAB NAVIGATION
+================================================================ */
 
-let shared =
-document.getElementById(
-"expenseType"
-).value === "shared";
+function showPersonalTab(tab){
 
-document.getElementById(
-"sharedPanel"
-).classList.toggle(
-"hidden",
-!shared
-);
+    const tabs = {
 
-if (
-shared &&
-!document.getElementById(
-"contributors"
-).children.length
-) {
+        dashboard:
+            "personalDashboard",
 
-addContributor();
+        expense:
+            "personalExpense",
 
-}
-
-}
-
+        history:
+            "personalHistory",
 
-function addContributor(
-name="",
-amount=""
-) {
+        data:
+            "personalData"
 
-let container =
-document.getElementById(
-"contributors"
-);
+    };
 
-let row =
-document.createElement("div");
 
-row.className =
-"person";
+    Object
+        .values(tabs)
+        .forEach(id => {
 
-row.innerHTML = `
+            document
+                .getElementById(id)
+                .classList.add("hidden");
 
-<input
-placeholder="Person name"
-value="${escapeHTML(name)}">
+        });
 
-<input
-type="number"
-min="0"
-placeholder="₹"
-value="${amount}">
 
-<button
-class="danger"
-onclick="
-this.parentElement.remove();
-updateContributorTotal();
-">
+    document
+        .getElementById(tabs[tab])
+        .classList.remove("hidden");
 
-×
-</button>
 
-`;
+    document
+        .querySelectorAll(
+            "#personalBudget .nav button"
+        )
+        .forEach(button =>
+            button.classList.remove("active")
+        );
 
-row.querySelectorAll("input")
-.forEach(
-input =>
-input.oninput =
-updateContributorTotal
-);
 
-container.appendChild(row);
+    const buttonMap = {
 
-updateContributorTotal();
+        dashboard:
+            "personalNavDashboard",
 
-}
-
+        expense:
+            "personalNavExpense",
 
-function updateContributorTotal() {
+        history:
+            "personalNavHistory",
 
-let total = 0;
+        data:
+            "personalNavData"
 
-document
-.querySelectorAll(
-"#contributors .person"
-)
-.forEach(row => {
+    };
 
-total +=
-Number(
-row.children[1].value
-)||0;
 
-});
+    document
+        .getElementById(
+            buttonMap[tab]
+        )
+        .classList.add("active");
 
-document.getElementById(
-"contributorTotal"
-).textContent =
-"Total: "+INR(total);
 
-}
+    if(tab === "dashboard"){
 
+        renderPersonalDashboard();
 
-function saveExpense() {
+    }
 
-let amount =
-Number(
-document.getElementById(
-"expenseAmount"
-).value
-)||0;
 
-if (amount <= 0) {
+    if(tab === "history"){
 
-alert(
-"Enter an expense amount."
-);
+        renderPersonalHistory();
 
-return;
+    }
 
 }
-
 
-let type =
-document.getElementById(
-"expenseType"
-).value;
 
-let contributors = [];
+/* ================================================================
+   PERSONAL INITIALISATION
+================================================================ */
 
+function initialisePersonalBudget(){
 
-if (type === "shared") {
+    ensurePersonalMonth(
+        currentPersonalMonth
+    );
 
-document
-.querySelectorAll(
-"#contributors .person"
-)
-.forEach(row => {
 
-contributors.push({
+    populatePersonalCategories();
 
-name:
-row.children[0].value.trim(),
 
-amount:
-Number(
-row.children[1].value
-)||0
+    document.getElementById(
+        "personalMonth"
+    ).value =
+        currentPersonalMonth;
 
-});
 
-});
+    populatePersonalIterations();
 
 
-if (
-!contributors.length ||
-contributors.some(
-person => !person.name
-)
-) {
+    document.getElementById(
+        "personalExpenseDate"
+    ).value =
+        today();
 
-alert(
-"Enter all contributor names."
-);
 
-return;
+    showPersonalTab(
+        "dashboard"
+    );
 
 }
 
 
-let contributorTotal =
-contributors.reduce(
-(sum,person) =>
-sum+person.amount,
-0
-);
+function populatePersonalCategories(){
 
+    const select =
+        document.getElementById(
+            "personalExpenseCategory"
+        );
 
-if (
-contributorTotal !== amount
-) {
 
-alert(
-"Contributor amounts must equal the group expense."
-);
+    const filter =
+        document.getElementById(
+            "personalHistoryFilter"
+        );
 
-return;
 
-}
-
-}
-
+    const options =
+        PERSONAL_CATEGORIES
+            .map(
+                category =>
+                    `<option value="${escapeHTML(category.name)}">
+                        ${escapeHTML(category.name)}
+                     </option>`
+            )
+            .join("");
 
-let yourContribution =
-amount;
 
+    select.innerHTML =
+        options;
 
-if (type === "shared") {
 
-let me =
-contributors.find(
-person =>
-person.name
-.toLowerCase()
-=== "me"
-);
+    filter.innerHTML =
+        `<option value="">All</option>` +
+        options;
 
-yourContribution =
-me
-? me.amount
-: 0;
-
 }
-
 
-let expense = {
 
-id:
-editingExpenseId ||
-Date.now(),
+function populatePersonalIterations(){
 
-amount:
+    const monthData =
+        ensurePersonalMonth(
+            currentPersonalMonth
+        );
 
-amount,
 
-yourContribution:
+    const select =
+        document.getElementById(
+            "personalIteration"
+        );
 
-yourContribution,
 
-date:
+    const names =
+        Object.keys(
+            monthData.iterations
+        );
 
-document.getElementById(
-"expenseDate"
-).value,
 
-category:
+    if(
+        !names.includes(
+            currentPersonalIteration
+        )
+    ){
 
-document.getElementById(
-"expenseCategory"
-).value,
+        currentPersonalIteration =
+            names[0] || "Default";
 
-payment:
+    }
 
-document.getElementById(
-"paymentMethod"
-).value,
 
-description:
+    select.innerHTML =
+        names
+            .map(
+                name =>
+                    `<option value="${escapeHTML(name)}">
+                        ${escapeHTML(name)}
+                     </option>`
+            )
+            .join("");
 
-document.getElementById(
-"expenseDescription"
-).value
-.trim(),
 
-type:
+    select.value =
+        currentPersonalIteration;
 
-type,
-
-contributors:
+}
 
-contributors
 
-};
+/* ================================================================
+   PERSONAL MONTH / ITERATION
+================================================================ */
 
+function changePersonalMonth(){
 
-let expenses =
-currentData().expenses;
+    currentPersonalMonth =
+        document.getElementById(
+            "personalMonth"
+        ).value;
 
 
-if (editingExpenseId) {
+    currentPersonalIteration =
+        "Default";
 
-let index =
-expenses.findIndex(
-expense =>
-expense.id ===
-editingExpenseId
-);
 
-if (index >= 0) {
+    ensurePersonalMonth(
+        currentPersonalMonth
+    );
 
-expenses[index] =
-expense;
 
-}
+    populatePersonalIterations();
 
-} else {
 
-expenses.push(expense);
+    renderPersonalDashboard();
 
 }
 
 
-saveDatabase();
+function changePersonalIteration(){
 
-clearExpenseForm();
+    currentPersonalIteration =
+        document.getElementById(
+            "personalIteration"
+        ).value;
 
-render();
 
-showTab("dashboard");
+    renderPersonalDashboard();
 
 }
-
-
-function editExpense(id) {
-
-let expense =
-currentData()
-.expenses
-.find(
-expense =>
-expense.id === id
-);
 
-if (!expense) return;
 
-editingExpenseId = id;
+function createPersonalIteration(){
 
-document.getElementById(
-"expenseFormTitle"
-).textContent =
-"Edit Expense";
+    const name =
+        prompt(
+            "Enter a name for this iteration:"
+        );
 
-document.getElementById(
-"expenseAmount"
-).value =
-expense.amount;
 
-document.getElementById(
-"expenseDate"
-).value =
-expense.date;
+    if(!name){
 
-document.getElementById(
-"expenseCategory"
-).value =
-expense.category;
+        return;
 
-document.getElementById(
-"paymentMethod"
-).value =
-expense.payment;
+    }
 
-document.getElementById(
-"expenseDescription"
-).value =
-expense.description || "";
 
-document.getElementById(
-"expenseType"
-).value =
-expense.type || "personal";
+    const cleanName =
+        name.trim();
 
 
-document.getElementById(
-"contributors"
-).innerHTML =
-"";
+    if(!cleanName){
 
+        return;
 
-if (
-expense.type === "shared"
-) {
+    }
 
-(expense.contributors || [])
-.forEach(
-person =>
-addContributor(
-person.name,
-person.amount
-)
-);
 
-}
-
+    const monthData =
+        ensurePersonalMonth(
+            currentPersonalMonth
+        );
 
-toggleShared();
 
-showTab("expense");
-
-}
+    if(
+        monthData.iterations[
+            cleanName
+        ]
+    ){
 
+        alert(
+            "An iteration with that name already exists."
+        );
 
-function deleteExpense(id) {
+        return;
 
-if (
-!confirm(
-"Delete this expense?"
-)
-) return;
+    }
 
-currentData().expenses =
-currentData()
-.expenses
-.filter(
-expense =>
-expense.id !== id
-);
 
-saveDatabase();
+    monthData.iterations[
+        cleanName
+    ] = {
 
-render();
+        salary:
+            monthData
+                .iterations[
+                    currentPersonalIteration
+                ].salary || 0,
 
-}
+        expenses:[]
 
+    };
 
-function clearExpenseForm() {
 
-editingExpenseId = null;
+    currentPersonalIteration =
+        cleanName;
 
-document.getElementById(
-"expenseFormTitle"
-).textContent =
-"Add Expense";
 
-document.getElementById(
-"expenseAmount"
-).value =
-"";
+    saveAppData();
 
-document.getElementById(
-"expenseDescription"
-).value =
-"";
 
-document.getElementById(
-"expenseType"
-).value =
-"personal";
+    populatePersonalIterations();
 
-document.getElementById(
-"contributors"
-).innerHTML =
-"";
 
-document.getElementById(
-"sharedPanel"
-).classList.add(
-"hidden"
-);
+    renderPersonalDashboard();
 
 }
-
 
-function expenseHTML(
-expense,
-showButtons
-) {
 
-let shared =
-expense.type === "shared";
+function renamePersonalIteration(){
 
-let contributors =
-(expense.contributors || [])
-.map(
-person =>
-escapeHTML(person.name)
-+": "+
-INR(person.amount)
-)
-.join(" · ");
+    const newName =
+        prompt(
+            "Enter the new iteration name:",
+            currentPersonalIteration
+        );
 
 
-return `
+    if(!newName){
 
-<div class="row">
+        return;
 
-<div class="expense">
+    }
 
-<div>
 
-<b>
+    const cleanName =
+        newName.trim();
 
-${escapeHTML(
-expense.description ||
-expense.category
-)}
 
-</b>
+    if(
+        !cleanName ||
+        cleanName === currentPersonalIteration
+    ){
 
-<div class="small muted">
+        return;
 
-${escapeHTML(
-expense.category
-)}
-·
-${escapeHTML(
-expense.payment
-)}
-·
-${escapeHTML(
-expense.date
-)}
+    }
 
-${shared
-? '<span class="chip">Shared</span>'
-: ''}
 
-</div>
+    const monthData =
+        ensurePersonalMonth(
+            currentPersonalMonth
+        );
 
 
-${
-shared
-? `
+    if(
+        monthData.iterations[
+            cleanName
+        ]
+    ){
 
-<div class="small">
+        alert(
+            "That iteration already exists."
+        );
 
-Group total:
-${INR(expense.amount)}
+        return;
 
-<br>
+    }
 
-Your contribution:
-${INR(expense.yourContribution)}
 
-<br>
+    monthData.iterations[
+        cleanName
+    ] =
+        monthData.iterations[
+            currentPersonalIteration
+        ];
 
-${contributors}
 
-</div>
+    delete monthData.iterations[
+        currentPersonalIteration
+    ];
 
-`
-: ""
-}
 
-</div>
+    currentPersonalIteration =
+        cleanName;
 
 
-<div style="text-align:right">
+    saveAppData();
 
-<b>
 
-${INR(
-expense.yourContribution ??
-expense.amount
-)}
+    populatePersonalIterations();
 
-</b>
 
+    renderPersonalDashboard();
 
-${
-showButtons
-? `
+}
 
-<div class="actions">
 
-<button
-class="secondary"
-onclick="
-editExpense(${expense.id})
-">
+function deletePersonalIteration(){
 
-Edit
+    const monthData =
+        ensurePersonalMonth(
+            currentPersonalMonth
+        );
 
-</button>
 
-<button
-class="danger"
-onclick="
-deleteExpense(${expense.id})
-">
+    const names =
+        Object.keys(
+            monthData.iterations
+        );
 
-Delete
 
-</button>
+    if(names.length <= 1){
 
-</div>
+        alert(
+            "At least one iteration must remain."
+        );
 
-`
-: ""
-}
+        return;
 
-</div>
+    }
 
-</div>
 
-</div>
+    if(
+        !confirm(
+            `Delete "${currentPersonalIteration}" and all its expenses?`
+        )
+    ){
 
-`;
+        return;
 
-}
+    }
 
 
-function renderRecentExpenses() {
-
-let expenses =
-[
-...currentData().expenses
-]
-.sort(
-(a,b) =>
-b.date.localeCompare(a.date)
-)
-.slice(0,5);
-
-
-document.getElementById(
-"recentExpenses"
-).innerHTML =
-
-expenses.length
-? expenses
-.map(
-expense =>
-expenseHTML(
-expense,
-false
-)
-)
-.join("")
-: '<div class="empty">No expenses.</div>';
+    delete monthData.iterations[
+        currentPersonalIteration
+    ];
 
-}
 
+    currentPersonalIteration =
+        Object.keys(
+            monthData.iterations
+        )[0];
 
-/* ==============================
-   HISTORY
-============================== */
-
-function renderHistory() {
-
-let category =
-document.getElementById(
-"filterCategory"
-).value;
-
-let search =
-(
-document.getElementById(
-"searchExpense"
-).value || ""
-)
-.toLowerCase();
-
-
-let expenses =
-currentData()
-.expenses
-.filter(
-expense => {
-
-let categoryMatch =
-!category ||
-expense.category ===
-category;
-
-let searchMatch =
-!search ||
-JSON.stringify(expense)
-.toLowerCase()
-.includes(search);
-
-return categoryMatch &&
-searchMatch;
-
-})
-.sort(
-(a,b) =>
-b.date.localeCompare(a.date)
-);
-
-
-document.getElementById(
-"historyList"
-).innerHTML =
-
-expenses.length
-? expenses
-.map(
-expense =>
-expenseHTML(
-expense,
-true
-)
-)
-.join("")
-: '<div class="empty">No matching expenses.</div>';
 
-}
+    saveAppData();
 
 
-/* ==============================
-   CSV EXPORT
-============================== */
+    populatePersonalIterations();
 
-function csvEscape(value) {
 
-return '"'+
-String(value ?? "")
-.replace(/"/g,'""')+
-'"';
+    renderPersonalDashboard();
 
 }
 
 
-function exportCSV() {
+/* ================================================================
+   PERSONAL SALARY
+================================================================ */
 
-let rows = [[
+function savePersonalSalary(){
 
-"Month",
+    const data =
+        getPersonalIteration();
 
-"Iteration",
 
-"Salary (INR)",
+    data.salary =
+        Number(
+            document.getElementById(
+                "personalSalary"
+            ).value
+        ) || 0;
 
-"Category",
 
-"Budget %",
+    saveAppData();
 
-"Budget (INR)",
 
-"Group Expense (INR)",
+    renderPersonalDashboard();
 
-"Your Contribution (INR)",
+}
 
-"Date",
 
-"Payment Method",
+/* ================================================================
+   PERSONAL DASHBOARD
+================================================================ */
 
-"Description",
+function renderPersonalDashboard(){
 
-"Expense Type",
+    const data =
+        getPersonalIteration();
 
-"Contributors"
 
-]];
+    const salary =
+        Number(data.salary) || 0;
 
 
-Object.entries(
-database.months
-)
-.forEach(
-([month,monthData]) => {
+    const actual =
+        data.expenses.reduce(
+            (total, expense) =>
+                total +
+                Number(expense.amount || 0),
+            0
+        );
 
-Object.entries(
-monthData.iterations
-)
-.forEach(
-([iteration,data]) => {
 
-data.expenses.forEach(
-expense => {
+    document.getElementById(
+        "personalSalary"
+    ).value =
+        salary || "";
 
-let category =
-CATEGORIES.find(
-category =>
-category[0] ===
-expense.category
-);
 
-let percentage =
-category
-? category[1]
-: 0;
+    document.getElementById(
+        "personalSalaryStat"
+    ).textContent =
+        money(salary);
 
-let budget =
-(
-data.salary || 0
-) *
-percentage /
-100;
 
+    document.getElementById(
+        "personalBudgetStat"
+    ).textContent =
+        money(salary);
 
-let contributors =
-(
-expense.contributors || []
-)
-.map(
-person =>
-person.name+
-":"+
-person.amount
-)
-.join("|");
 
+    document.getElementById(
+        "personalActualStat"
+    ).textContent =
+        money(actual);
 
-rows.push([
 
-month,
+    document.getElementById(
+        "personalRemainingStat"
+    ).textContent =
+        money(salary - actual);
 
-iteration,
 
-data.salary,
+    const container =
+        document.getElementById(
+            "personalCategories"
+        );
 
-expense.category,
 
-percentage,
+    container.innerHTML =
+        PERSONAL_CATEGORIES
+            .map(category => {
 
-budget,
+                const budget =
+                    salary *
+                    category.percentage /
+                    100;
 
-expense.amount,
 
-expense.yourContribution ??
-expense.amount,
+                const spent =
+                    data.expenses
+                        .filter(
+                            expense =>
+                                expense.category ===
+                                category.name
+                        )
+                        .reduce(
+                            (total,expense) =>
+                                total +
+                                Number(
+                                    expense.amount || 0
+                                ),
+                            0
+                        );
 
-expense.date,
 
-expense.payment,
+                const remaining =
+                    budget - spent;
 
-expense.description,
 
-expense.type,
+                const percentage =
+                    budget > 0
+                        ? Math.min(
+                            100,
+                            spent / budget * 100
+                        )
+                        : 0;
 
-contributors
 
-]);
+                return `
 
-});
+                    <div class="row">
 
-});
+                        <div class="row-flex">
 
-});
+                            <div>
 
+                                <strong>
+                                    ${escapeHTML(category.name)}
+                                </strong>
 
-let csv =
-"\uFEFF"+
-rows
-.map(
-row =>
-row
-.map(csvEscape)
-.join(",")
-)
-.join("\r\n");
+                                <div class="small muted">
+                                    ${category.percentage}%
+                                    · Budget
+                                    ${money(budget)}
+                                </div>
 
+                            </div>
 
-downloadFile(
 
-new Blob(
-[csv],
-{
-type:
-"text/csv;charset=utf-8"
-}
-),
+                            <div style="text-align:right">
 
-"my-budget-export.csv"
+                                <strong>
+                                    ${money(spent)}
+                                </strong>
 
-);
+                                <div class="small
+                                    ${remaining >= 0
+                                        ? "good"
+                                        : "bad"}">
 
-}
+                                    ${remaining >= 0
+                                        ? money(remaining)
+                                          + " remaining"
+                                        : money(-remaining)
+                                          + " over budget"}
 
+                                </div>
 
-/* ==============================
-   CSV IMPORT
-============================== */
+                            </div>
 
-function parseCSV(text) {
+                        </div>
 
-let rows = [];
 
-let row = [];
+                        <div class="progress">
 
-let value = "";
+                            <div
+                                class="progress-fill"
+                                style="width:${percentage}%"
+                            ></div>
 
-let quoted = false;
+                        </div>
 
+                    </div>
 
-for (
-let i=0;
-i<text.length;
-i++
-) {
+                `;
 
-let char =
-text[i];
+            })
+            .join("");
 
+}
 
-if (char === '"') {
 
-if (
-quoted &&
-text[i+1] === '"'
-) {
+/* ================================================================
+   PERSONAL EXPENSE FORM
+================================================================ */
 
-value += '"';
+function savePersonalExpense(){
 
-i++;
+    const amount =
+        Number(
+            document.getElementById(
+                "personalExpenseAmount"
+            ).value
+        );
 
-} else {
 
-quoted = !quoted;
+    if(amount <= 0){
 
-}
+        alert(
+            "Please enter an expense amount."
+        );
 
-}
+        return;
 
-else if (
-char === "," &&
-!quoted
-) {
+    }
 
-row.push(value);
 
-value = "";
+    const expense = {
 
-}
+        id:
+            editingPersonalExpenseId ||
+            Date.now(),
 
-else if (
-(
-char === "\n" ||
-char === "\r"
-) &&
-!quoted
-) {
+        amount,
 
-if (
-char === "\r" &&
-text[i+1] === "\n"
-) {
+        date:
+            document.getElementById(
+                "personalExpenseDate"
+            ).value ||
+            today(),
 
-i++;
+        category:
+            document.getElementById(
+                "personalExpenseCategory"
+            ).value,
 
-}
+        payment:
+            document.getElementById(
+                "personalExpensePayment"
+            ).value,
 
-row.push(value);
+        description:
+            document.getElementById(
+                "personalExpenseDescription"
+            ).value.trim()
 
-if (
-row.some(
-item => item !== ""
-)
-) {
+    };
 
-rows.push(row);
 
-}
+    const data =
+        getPersonalIteration();
 
-row = [];
 
-value = "";
+    const existingIndex =
+        data.expenses.findIndex(
+            item =>
+                item.id ===
+                editingPersonalExpenseId
+        );
 
-}
 
-else {
+    if(existingIndex >= 0){
 
-value += char;
+        data.expenses[
+            existingIndex
+        ] = expense;
 
-}
+    }else{
 
-}
+        data.expenses.push(
+            expense
+        );
 
+    }
 
-if (
-value ||
-row.length
-) {
 
-row.push(value);
+    saveAppData();
 
-rows.push(row);
 
-}
+    clearPersonalExpenseForm();
 
 
-return rows;
+    showPersonalTab(
+        "dashboard"
+    );
 
 }
-
-
-function importCSV(event) {
-
-let file =
-event.target.files[0];
 
-if (!file) return;
 
+function clearPersonalExpenseForm(){
 
-let reader =
-new FileReader();
+    editingPersonalExpenseId =
+        null;
 
 
-reader.onload =
-function() {
+    document.getElementById(
+        "personalExpenseTitle"
+    ).textContent =
+        "Add Expense";
 
-try {
 
-let rows =
-parseCSV(
-reader.result
-);
+    document.getElementById(
+        "personalExpenseAmount"
+    ).value =
+        "";
 
-let headers =
-rows.shift();
 
+    document.getElementById(
+        "personalExpenseDate"
+    ).value =
+        today();
 
-function column(name) {
 
-return headers.indexOf(name);
+    document.getElementById(
+        "personalExpenseDescription"
+    ).value =
+        "";
 
 }
 
 
-rows.forEach(
-row => {
+function editPersonalExpense(id){
 
-let month =
-row[
-column("Month")
-];
+    const data =
+        getPersonalIteration();
 
-let iteration =
-row[
-column("Iteration")
-] ||
-"Default";
 
+    const expense =
+        data.expenses.find(
+            item =>
+                item.id === id
+        );
 
-if (!month) return;
 
+    if(!expense){
 
-let monthData =
-ensureMonth(month);
+        return;
 
+    }
 
-if (
-!monthData
-.iterations
-[iteration]
-) {
 
-monthData
-.iterations
-[iteration] = {
+    editingPersonalExpenseId =
+        id;
 
-salary:
-Number(
-row[
-column(
-"Salary (INR)"
-)
-]
-)||0,
 
-expenses:[]
+    document.getElementById(
+        "personalExpenseTitle"
+    ).textContent =
+        "Edit Expense";
 
-};
 
-}
-
-
-let data =
-monthData
-.iterations
-[iteration];
-
+    document.getElementById(
+        "personalExpenseAmount"
+    ).value =
+        expense.amount;
 
-let contributorText =
-row[
-column("Contributors")
-] || "";
 
+    document.getElementById(
+        "personalExpenseDate"
+    ).value =
+        expense.date;
 
-let contributors =
-contributorText
-.split("|")
-.filter(Boolean)
-.map(
-item => {
 
-let separator =
-item.lastIndexOf(":");
+    document.getElementById(
+        "personalExpenseCategory"
+    ).value =
+        expense.category;
 
-return {
 
-name:
-item.substring(
-0,
-separator
-),
+    document.getElementById(
+        "personalExpensePayment"
+    ).value =
+        expense.payment;
 
-amount:
-Number(
-item.substring(
-separator+1
-)
-)||0
 
-};
+    document.getElementById(
+        "personalExpenseDescription"
+    ).value =
+        expense.description || "";
 
-});
 
+    showPersonalTab(
+        "expense"
+    );
 
-data.expenses.push({
+}
 
-id:
-Date.now()+
-Math.random(),
 
-amount:
-Number(
-row[
-column(
-"Group Expense (INR)"
-)
-]
-)||0,
+function deletePersonalExpense(id){
 
-yourContribution:
-Number(
-row[
-column(
-"Your Contribution (INR)"
-)
-]
-)||0,
+    if(
+        !confirm(
+            "Delete this expense?"
+        )
+    ){
 
-date:
-row[
-column("Date")
-],
+        return;
 
-category:
-row[
-column("Category")
-],
+    }
 
-payment:
-row[
-column("Payment Method")
-],
 
-description:
-row[
-column("Description")
-],
+    const data =
+        getPersonalIteration();
 
-type:
-row[
-column("Expense Type")
-] ||
-"personal",
 
-contributors:
-contributors
+    data.expenses =
+        data.expenses.filter(
+            expense =>
+                expense.id !== id
+        );
 
-});
 
-});
+    saveAppData();
 
 
-saveDatabase();
+    renderPersonalHistory();
 
-render();
 
-alert(
-"CSV imported successfully."
-);
+    renderPersonalDashboard();
 
 }
-
-catch(error) {
 
-alert(
-"CSV import failed. Please use a CSV exported by this app."
-);
 
-}
+/* ================================================================
+   PERSONAL HISTORY
+================================================================ */
 
-};
+function renderPersonalHistory(){
 
+    const data =
+        getPersonalIteration();
 
-reader.readAsText(file);
 
-}
+    const filter =
+        document.getElementById(
+            "personalHistoryFilter"
+        ).value;
 
 
-/* ==============================
-   FILE DOWNLOAD
-============================== */
+    const search =
+        document.getElementById(
+            "personalHistorySearch"
+        ).value
+        .trim()
+        .toLowerCase();
 
-function downloadFile(
-blob,
-filename
-) {
 
-let link =
-document.createElement("a");
+    let expenses =
+        [...data.expenses];
 
-link.href =
-URL.createObjectURL(blob);
 
-link.download =
-filename;
+    if(filter){
 
-link.click();
+        expenses =
+            expenses.filter(
+                expense =>
+                    expense.category ===
+                    filter
+            );
 
-setTimeout(
-() =>
-URL.revokeObjectURL(
-link.href
-),
-1000
-);
+    }
 
-}
 
+    if(search){
 
-/* ==============================
-   ENCRYPTED BACKUP
-============================== */
+        expenses =
+            expenses.filter(
+                expense =>
+                    JSON.stringify(
+                        expense
+                    )
+                    .toLowerCase()
+                    .includes(search)
+            );
 
-async function exportEncryptedBackup() {
+    }
 
-let password =
-prompt(
-"Create a backup password (minimum 8 characters):"
-);
 
-if (
-!password ||
-password.length < 8
-) {
+    expenses.sort(
+        (a,b) =>
+            String(b.date)
+                .localeCompare(
+                    String(a.date)
+                )
+    );
 
-alert(
-"Please use at least 8 characters."
-);
 
-return;
+    const container =
+        document.getElementById(
+            "personalExpenseList"
+        );
 
-}
 
+    if(!expenses.length){
 
-let encoder =
-new TextEncoder();
+        container.innerHTML =
+            `<div class="empty">
+                No expenses found.
+             </div>`;
 
+        return;
 
-let salt =
-crypto.getRandomValues(
-new Uint8Array(16)
-);
+    }
 
-let iv =
-crypto.getRandomValues(
-new Uint8Array(12)
-);
 
+    container.innerHTML =
+        expenses.map(
+            expense => `
 
-let baseKey =
-await crypto.subtle.importKey(
+                <div class="row">
 
-"raw",
+                    <div class="row-flex">
 
-encoder.encode(
-password
-),
+                        <div>
 
-"PBKDF2",
+                            <strong>
+                                ${escapeHTML(
+                                    expense.description ||
+                                    expense.category
+                                )}
+                            </strong>
 
-false,
+                            <div class="small muted">
 
-["deriveKey"]
+                                ${escapeHTML(
+                                    expense.category
+                                )}
 
-);
+                                ·
 
+                                ${escapeHTML(
+                                    expense.date
+                                )}
 
-let key =
-await crypto.subtle.deriveKey(
+                                ·
 
-{
+                                ${escapeHTML(
+                                    expense.payment
+                                )}
 
-name:"PBKDF2",
+                            </div>
 
-salt:salt,
+                        </div>
 
-iterations:250000,
 
-hash:"SHA-256"
+                        <div style="text-align:right">
 
-},
+                            <strong>
+                                ${money(expense.amount)}
+                            </strong>
 
-baseKey,
+                            <div class="actions">
 
-{
+                                <button
+                                    class="secondary"
+                                    onclick="editPersonalExpense(${expense.id})"
+                                >
+                                    Edit
+                                </button>
 
-name:"AES-GCM",
+                                <button
+                                    class="danger"
+                                    onclick="deletePersonalExpense(${expense.id})"
+                                >
+                                    Delete
+                                </button>
 
-length:256
+                            </div>
 
-},
+                        </div>
 
-false,
+                    </div>
 
-["encrypt"]
+                </div>
 
-);
+            `
+        ).join("");
 
+}
 
-let encrypted =
-await crypto.subtle.encrypt(
 
-{
+/* ================================================================
+   CSV HELPERS
+================================================================ */
 
-name:"AES-GCM",
+function csvEscape(value){
 
-iv:iv
+    return '"' +
+        String(value ?? "")
+            .replace(/"/g,'""') +
+        '"';
 
-},
+}
 
-key,
 
-encoder.encode(
-JSON.stringify(
-database
-)
-)
+function downloadCSV(
+    content,
+    filename
+){
 
-);
+    const blob =
+        new Blob(
+            ["\uFEFF" + content],
+            {
+                type:"text/csv;charset=utf-8;"
+            }
+        );
 
 
-let backup = {
+    const url =
+        URL.createObjectURL(blob);
 
-version:1,
 
-salt:
-Array.from(salt),
+    const link =
+        document.createElement("a");
 
-iv:
-Array.from(iv),
 
-data:
-Array.from(
-new Uint8Array(
-encrypted
-)
-)
+    link.href =
+        url;
 
-};
 
+    link.download =
+        filename;
 
-downloadFile(
 
-new Blob(
-[
-JSON.stringify(backup)
-],
-{
-type:
-"application/octet-stream"
-}
-),
+    document.body.appendChild(
+        link
+    );
 
-"my-budget-encrypted-backup.mbbackup"
 
-);
+    link.click();
 
-}
 
+    link.remove();
 
-/* ==============================
-   ENCRYPTED RESTORE
-============================== */
 
-async function importEncryptedBackup(
-event
-) {
+    setTimeout(
+        () =>
+            URL.revokeObjectURL(url),
+        1000
+    );
 
-let file =
-event.target.files[0];
+}
 
-if (!file) return;
 
+/* ================================================================
+   PERSONAL CSV EXPORT
+================================================================ */
 
-let reader =
-new FileReader();
+function exportPersonalCSV(){
 
+    const rows = [
 
-reader.onload =
-async function() {
+        [
+            "Month",
+            "Iteration",
+            "Salary",
+            "Category",
+            "Amount",
+            "Date",
+            "Payment",
+            "Description"
+        ]
 
-try {
+    ];
 
-let backup =
-JSON.parse(
-reader.result
-);
 
-let password =
-prompt(
-"Enter your backup password:"
-);
+    Object.entries(
+        appData.personal.months
+    ).forEach(
+        ([month,monthData]) => {
 
-if (!password) return;
+            Object.entries(
+                monthData.iterations
+            ).forEach(
+                ([iteration,data]) => {
 
+                    data.expenses.forEach(
+                        expense => {
 
-let encoder =
-new TextEncoder();
+                            rows.push([
 
-let decoder =
-new TextDecoder();
+                                month,
 
+                                iteration,
 
-let baseKey =
-await crypto.subtle.importKey(
+                                data.salary,
 
-"raw",
+                                expense.category,
 
-encoder.encode(
-password
-),
+                                expense.amount,
 
-"PBKDF2",
+                                expense.date,
 
-false,
+                                expense.payment,
 
-["deriveKey"]
+                                expense.description
 
-);
+                            ]);
 
+                        }
+                    );
 
-let key =
-await crypto.subtle.deriveKey(
+                }
+            );
 
-{
+        }
+    );
 
-name:"PBKDF2",
 
-salt:
-new Uint8Array(
-backup.salt
-),
+    const csv =
+        rows
+            .map(
+                row =>
+                    row
+                        .map(csvEscape)
+                        .join(",")
+            )
+            .join("\r\n");
 
-iterations:250000,
 
-hash:"SHA-256"
+    downloadCSV(
+        csv,
+        "personal-budget.csv"
+    );
 
-},
+}
 
-baseKey,
 
-{
+/* ================================================================
+   CSV PARSER
+================================================================ */
 
-name:"AES-GCM",
+function parseCSV(text){
 
-length:256
+    const rows = [];
 
-},
+    let row = [];
 
-false,
+    let value = "";
 
-["decrypt"]
+    let quoted = false;
 
-);
 
+    for(
+        let i = 0;
+        i < text.length;
+        i++
+    ){
 
-let decrypted =
-await crypto.subtle.decrypt(
+        const char =
+            text[i];
 
-{
 
-name:"AES-GCM",
+        if(char === '"'){
 
-iv:
-new Uint8Array(
-backup.iv
-)
+            if(
+                quoted &&
+                text[i + 1] === '"'
+            ){
 
-},
+                value += '"';
 
-key,
+                i++;
 
-new Uint8Array(
-backup.data
-)
+            }else{
 
-);
+                quoted =
+                    !quoted;
 
+            }
 
-let restored =
-JSON.parse(
-decoder.decode(
-decrypted
-)
-);
+        }else if(
+            char === "," &&
+            !quoted
+        ){
 
+            row.push(value);
 
-if (!restored.months) {
+            value = "";
 
-throw new Error();
+        }else if(
+            (char === "\n" ||
+             char === "\r") &&
+            !quoted
+        ){
 
-}
+            if(
+                char === "\r" &&
+                text[i + 1] === "\n"
+            ){
 
+                i++;
 
-database =
-restored;
+            }
 
-saveDatabase();
 
-currentIteration = "";
+            row.push(value);
 
-loadIterations();
+            value = "";
 
-render();
 
+            if(
+                row.some(
+                    item =>
+                        item !== ""
+                )
+            ){
 
-alert(
-"Backup restored successfully."
-);
+                rows.push(row);
 
-}
+            }
 
-catch(error) {
 
-alert(
-"Restore failed. Check the password and backup file."
-);
+            row = [];
 
-}
+        }else{
 
-};
+            value += char;
 
+        }
 
-reader.readAsText(file);
+    }
 
-}
 
+    if(
+        value !== "" ||
+        row.length
+    ){
 
-/* ==============================
-   PIN SECURITY
-============================== */
+        row.push(value);
 
-async function hashPIN(pin) {
+        rows.push(row);
 
-let buffer =
-await crypto.subtle.digest(
+    }
 
-"SHA-256",
 
-new TextEncoder()
-.encode(pin)
+    return rows;
 
-);
+}
 
 
-return Array
-.from(
-new Uint8Array(buffer)
-)
-.map(
-byte =>
-byte
-.toString(16)
-.padStart(2,"0")
-)
-.join("");
+/* ================================================================
+   PERSONAL CSV IMPORT
+================================================================ */
 
-}
+function importPersonalCSV(event){
 
+    const file =
+        event.target.files[0];
 
-async function createPIN() {
 
-let pin1 =
-document.getElementById(
-"pin1"
-).value;
+    if(!file){
 
-let pin2 =
-document.getElementById(
-"pin2"
-).value;
+        return;
 
+    }
 
-if (!/^\d{4,8}$/.test(pin1)) {
 
-document.getElementById(
-"pinError"
-).textContent =
-"PIN must contain 4–8 digits.";
+    const reader =
+        new FileReader();
 
-return;
 
-}
+    reader.onload =
+        function(){
 
+            try{
 
-if (pin1 !== pin2) {
+                const rows =
+                    parseCSV(
+                        reader.result
+                    );
 
-document.getElementById(
-"pinError"
-).textContent =
-"PINs do not match.";
 
-return;
+                if(rows.length < 2){
 
-}
+                    throw new Error(
+                        "CSV is empty."
+                    );
 
+                }
 
-localStorage.setItem(
-PIN_KEY,
-await hashPIN(pin1)
-);
 
-sessionStorage.setItem(
-"budgetUnlocked",
-"1"
-);
+                const headers =
+                    rows.shift();
 
-document.getElementById(
-"lockScreen"
-).style.display =
-"none";
 
-}
+                const index =
+                    name =>
+                        headers.indexOf(name);
 
 
-async function unlockApp() {
+                rows.forEach(
+                    row => {
 
-let pin =
-document.getElementById(
-"pinInput"
-).value;
+                        const month =
+                            row[
+                                index("Month")
+                            ];
 
 
-let stored =
-localStorage.getItem(
-PIN_KEY
-);
+                        const iteration =
+                            row[
+                                index("Iteration")
+                            ] ||
+                            "Default";
 
 
-if (
-await hashPIN(pin) ===
-stored
-) {
+                        if(!month){
 
-sessionStorage.setItem(
-"budgetUnlocked",
-"1"
-);
+                            return;
 
-document.getElementById(
-"lockScreen"
-).style.display =
-"none";
+                        }
 
-}
 
-else {
+                        ensurePersonalMonth(
+                            month
+                        );
 
-document.getElementById(
-"pinError"
-).textContent =
-"Incorrect PIN.";
 
-}
+                        const monthData =
+                            appData
+                                .personal
+                                .months[
+                                    month
+                                ];
 
-}
 
+                        if(
+                            !monthData
+                                .iterations[
+                                    iteration
+                                ]
+                        ){
 
-function initializeLock() {
+                            monthData
+                                .iterations[
+                                    iteration
+                                ] = {
 
-if (
-sessionStorage.getItem(
-"budgetUnlocked"
-) === "1"
-) {
+                                    salary:
+                                        Number(
+                                            row[
+                                                index(
+                                                    "Salary"
+                                                )
+                                            ]
+                                        ) || 0,
 
-document.getElementById(
-"lockScreen"
-).style.display =
-"none";
+                                    expenses:[]
 
-return;
+                                };
 
-}
+                        }
 
 
-if (
-localStorage.getItem(
-PIN_KEY
-)
-) {
+                        monthData
+                            .iterations[
+                                iteration
+                            ]
+                            .expenses
+                            .push({
 
-document.getElementById(
-"pinSetup"
-).classList.add(
-"hidden"
-);
+                                id:
+                                    Date.now() +
+                                    Math.random(),
 
-document.getElementById(
-"pinLogin"
-).classList.remove(
-"hidden"
-);
+                                amount:
+                                    Number(
+                                        row[
+                                            index(
+                                                "Amount"
+                                            )
+                                        ]
+                                    ) || 0,
 
-}
+                                date:
+                                    row[
+                                        index(
+                                            "Date"
+                                        )
+                                    ],
 
-}
+                                category:
+                                    row[
+                                        index(
+                                            "Category"
+                                        )
+                                    ],
 
+                                payment:
+                                    row[
+                                        index(
+                                            "Payment"
+                                        )
+                                    ],
 
-/* ==============================
-   START APP
-============================== */
+                                description:
+                                    row[
+                                        index(
+                                            "Description"
+                                        )
+                                    ] || ""
 
-document.getElementById(
-"month"
-).value =
-currentMonth;
+                            });
 
+                    }
+                );
 
-document.getElementById(
-"expenseDate"
-).value =
-new Date()
-.toISOString()
-.slice(0,10);
 
+                saveAppData();
 
-loadIterations();
 
-render();
+                alert(
+                    "Personal CSV imported successfully."
+                );
 
-initializeLock();
 
-</script>
-<script>
+                initialisePersonalBudget();
 
-if ("serviceWorker" in navigator) {
+            }catch(error){
 
-  window.addEventListener("load", () => {
+                console.error(error);
 
-    navigator.serviceWorker.register("./service-worker.js")
+                alert(
+                    "Could not import the CSV file."
+                );
 
-      .catch(error => {
+            }
 
-        console.error("Service worker registration failed:", error);
+        };
 
-      });
 
-  });
+    reader.readAsText(
+        file
+    );
 
 }
-
-</script>
-</body>
+      </body>
 </html>
