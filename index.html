@@ -3403,5 +3403,3243 @@ function importPersonalCSV(event){
     );
 
 }
-      </body>
-</html>
+/* ================================================================
+   SHARED EXPENSES INITIALISATION
+================================================================ */
+
+function initialiseSharedExpenses(){
+
+    populateSharedGroups();
+
+    populateBalanceGroups();
+
+    populateSharedDataGroups();
+
+    document.getElementById(
+        "sharedExpenseDate"
+    ).value = today();
+
+    showSharedTab("groups");
+
+}
+
+
+/* ================================================================
+   SHARED TAB NAVIGATION
+================================================================ */
+
+function showSharedTab(tab){
+
+    const tabs = {
+
+        groups:"sharedGroups",
+        expense:"sharedExpense",
+        balances:"sharedBalances",
+        data:"sharedData"
+
+    };
+
+    Object.values(tabs).forEach(id => {
+
+        document
+            .getElementById(id)
+            .classList.add("hidden");
+
+    });
+
+    document
+        .getElementById(tabs[tab])
+        .classList.remove("hidden");
+
+
+    document
+        .querySelectorAll(
+            "#sharedExpenses .nav button"
+        )
+        .forEach(button =>
+            button.classList.remove("active")
+        );
+
+
+    const buttonMap = {
+
+        groups:"sharedNavGroups",
+        expense:"sharedNavExpense",
+        balances:"sharedNavBalances",
+        data:"sharedNavData"
+
+    };
+
+
+    document
+        .getElementById(buttonMap[tab])
+        .classList.add("active");
+
+
+    if(tab === "groups"){
+
+        populateSharedGroups();
+
+    }
+
+
+    if(tab === "expense"){
+
+        populateSharedExpenseGroups();
+
+        loadSharedGroupPeople();
+
+    }
+
+
+    if(tab === "balances"){
+
+        populateBalanceGroups();
+
+        renderSharedBalances();
+
+    }
+
+
+    if(tab === "data"){
+
+        populateSharedDataGroups();
+
+    }
+
+}
+
+
+/* ================================================================
+   SHARED GROUP CREATION
+================================================================ */
+
+function createSharedGroup(){
+
+    const name =
+        document
+            .getElementById(
+                "sharedGroupName"
+            )
+            .value
+            .trim();
+
+
+    const description =
+        document
+            .getElementById(
+                "sharedGroupDescription"
+            )
+            .value
+            .trim();
+
+
+    if(!name){
+
+        alert(
+            "Please enter a group name."
+        );
+
+        return;
+
+    }
+
+
+    const id =
+        "group_" +
+        Date.now();
+
+
+    appData.shared.groups[id] = {
+
+        id,
+
+        name,
+
+        description,
+
+        people:[],
+
+        expenses:[],
+
+        settlements:[]
+
+    };
+
+
+    saveAppData();
+
+
+    document
+        .getElementById(
+            "sharedGroupName"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "sharedGroupDescription"
+        )
+        .value = "";
+
+
+    populateSharedGroups();
+
+    populateSharedExpenseGroups();
+
+    populateBalanceGroups();
+
+    populateSharedDataGroups();
+
+}
+
+
+function populateSharedGroups(){
+
+    const container =
+        document.getElementById(
+            "sharedGroupList"
+        );
+
+
+    const groups =
+        Object.values(
+            appData.shared.groups
+        );
+
+
+    if(!groups.length){
+
+        container.innerHTML = `
+            <div class="empty">
+                No shared groups yet.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        groups.map(group => `
+
+            <div class="group-card">
+
+                <div class="row-flex">
+
+                    <div>
+
+                        <strong>
+                            ${escapeHTML(group.name)}
+                        </strong>
+
+                        <div class="small muted">
+                            ${escapeHTML(
+                                group.description || ""
+                            )}
+                        </div>
+
+                    </div>
+
+                    <span class="badge">
+                        ${group.people.length}
+                        ${group.people.length === 1
+                            ? "person"
+                            : "people"}
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="actions"
+                    style="margin-top:10px"
+                >
+
+                    <button
+                        onclick="manageSharedGroup('${group.id}')"
+                    >
+                        Manage
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="openSharedGroupExpense('${group.id}')"
+                    >
+                        + Expense
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="openSharedGroupBalances('${group.id}')"
+                    >
+                        Balances
+                    </button>
+
+                    <button
+                        class="danger"
+                        onclick="deleteSharedGroup('${group.id}')"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ================================================================
+   SHARED GROUP MANAGEMENT
+================================================================ */
+
+function manageSharedGroup(groupId){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return;
+
+    }
+
+
+    let action;
+
+
+    while(true){
+
+        action =
+            prompt(
+                `Manage "${group.name}"\n\n` +
+                `Type:\n` +
+                `1 = Add person\n` +
+                `2 = Remove person\n` +
+                `3 = Rename group\n` +
+                `4 = Change description\n` +
+                `5 = Done`
+            );
+
+
+        if(action === null ||
+           action === "5"){
+
+            break;
+
+        }
+
+
+        if(action === "1"){
+
+            addPersonToGroup(groupId);
+
+        }
+
+
+        else if(action === "2"){
+
+            removePersonFromGroup(groupId);
+
+        }
+
+
+        else if(action === "3"){
+
+            const newName =
+                prompt(
+                    "New group name:",
+                    group.name
+                );
+
+
+            if(newName &&
+               newName.trim()){
+
+                group.name =
+                    newName.trim();
+
+                saveAppData();
+
+            }
+
+        }
+
+
+        else if(action === "4"){
+
+            const description =
+                prompt(
+                    "New description:",
+                    group.description || ""
+                );
+
+
+            if(description !== null){
+
+                group.description =
+                    description.trim();
+
+                saveAppData();
+
+            }
+
+        }
+
+    }
+
+
+    populateSharedGroups();
+
+    populateSharedExpenseGroups();
+
+    populateBalanceGroups();
+
+}
+
+
+function addPersonToGroup(groupId){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    const name =
+        prompt(
+            "Enter person's name:"
+        );
+
+
+    if(!name ||
+       !name.trim()){
+
+        return;
+
+    }
+
+
+    const cleanName =
+        name.trim();
+
+
+    if(
+        group.people.some(
+            person =>
+                person.name.toLowerCase() ===
+                cleanName.toLowerCase()
+        )
+    ){
+
+        alert(
+            "That person is already in the group."
+        );
+
+        return;
+
+    }
+
+
+    group.people.push({
+
+        id:
+            "person_" +
+            Date.now() +
+            "_" +
+            Math.random(),
+
+        name:cleanName
+
+    });
+
+
+    saveAppData();
+
+
+    populateSharedGroups();
+
+}
+
+
+function removePersonFromGroup(groupId){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group.people.length){
+
+        alert(
+            "There are no people to remove."
+        );
+
+        return;
+
+    }
+
+
+    const names =
+        group.people
+            .map(
+                (person,index) =>
+                    `${index + 1}. ${person.name}`
+            )
+            .join("\n");
+
+
+    const answer =
+        prompt(
+            "Enter the number to remove:\n\n" +
+            names
+        );
+
+
+    const index =
+        Number(answer) - 1;
+
+
+    if(
+        !Number.isInteger(index) ||
+        !group.people[index]
+    ){
+
+        return;
+
+    }
+
+
+    const person =
+        group.people[index];
+
+
+    const hasExpenses =
+        group.expenses.some(
+            expense =>
+                expense.paidBy === person.id ||
+                expense.splits.some(
+                    split =>
+                        split.personId === person.id
+                )
+        );
+
+
+    if(hasExpenses){
+
+        alert(
+            "This person cannot be removed because " +
+            "they are already included in an expense."
+        );
+
+        return;
+
+    }
+
+
+    group.people.splice(index,1);
+
+
+    saveAppData();
+
+}
+
+
+/* ================================================================
+   DELETE SHARED GROUP
+================================================================ */
+
+function deleteSharedGroup(groupId){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return;
+
+    }
+
+
+    if(
+        !confirm(
+            `Delete "${group.name}" and all of its data?`
+        )
+    ){
+
+        return;
+
+    }
+
+
+    delete appData.shared.groups[groupId];
+
+
+    saveAppData();
+
+
+    populateSharedGroups();
+
+    populateSharedExpenseGroups();
+
+    populateBalanceGroups();
+
+    populateSharedDataGroups();
+
+}
+
+
+/* ================================================================
+   SHARED GROUP SELECTS
+================================================================ */
+
+function populateSharedExpenseGroups(){
+
+    const select =
+        document.getElementById(
+            "sharedExpenseGroup"
+        );
+
+
+    const groups =
+        Object.values(
+            appData.shared.groups
+        );
+
+
+    select.innerHTML =
+        groups.length
+            ? groups.map(group => `
+                <option value="${group.id}">
+                    ${escapeHTML(group.name)}
+                </option>
+            `).join("")
+            : `<option value="">
+                No groups available
+               </option>`;
+
+
+    if(groups.length){
+
+        loadSharedGroupPeople();
+
+    }
+
+}
+
+
+function populateBalanceGroups(){
+
+    const select =
+        document.getElementById(
+            "balanceGroup"
+        );
+
+
+    const groups =
+        Object.values(
+            appData.shared.groups
+        );
+
+
+    select.innerHTML =
+        groups.length
+            ? groups.map(group => `
+                <option value="${group.id}">
+                    ${escapeHTML(group.name)}
+                </option>
+            `).join("")
+            : `<option value="">
+                No groups available
+               </option>`;
+
+}
+
+
+function populateSharedDataGroups(){
+
+    const select =
+        document.getElementById(
+            "sharedDataGroup"
+        );
+
+
+    const groups =
+        Object.values(
+            appData.shared.groups
+        );
+
+
+    select.innerHTML =
+        groups.length
+            ? groups.map(group => `
+                <option value="${group.id}">
+                    ${escapeHTML(group.name)}
+                </option>
+            `).join("")
+            : `<option value="">
+                No groups available
+               </option>`;
+
+}
+
+
+/* ================================================================
+   OPEN SHARED EXPENSE FOR SPECIFIC GROUP
+================================================================ */
+
+function openSharedGroupExpense(groupId){
+
+    showSharedTab("expense");
+
+
+    const select =
+        document.getElementById(
+            "sharedExpenseGroup"
+        );
+
+
+    select.value =
+        groupId;
+
+
+    loadSharedGroupPeople();
+
+}
+
+
+function openSharedGroupBalances(groupId){
+
+    showSharedTab("balances");
+
+
+    document.getElementById(
+        "balanceGroup"
+    ).value =
+        groupId;
+
+
+    renderSharedBalances();
+
+}
+
+
+/* ================================================================
+   LOAD PEOPLE INTO EXPENSE FORM
+================================================================ */
+
+function loadSharedGroupPeople(){
+
+    const groupId =
+        document.getElementById(
+            "sharedExpenseGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    const form =
+        document.getElementById(
+            "sharedExpenseForm"
+        );
+
+
+    const noGroup =
+        document.getElementById(
+            "sharedNoGroupMessage"
+        );
+
+
+    if(
+        !group ||
+        group.people.length < 1
+    ){
+
+        form.classList.add("hidden");
+
+        noGroup.classList.remove("hidden");
+
+        if(group &&
+           group.people.length === 0){
+
+            noGroup.textContent =
+                "Add at least one person to this group before adding an expense.";
+
+        }else{
+
+            noGroup.textContent =
+                "Create a group first before adding a shared expense.";
+
+        }
+
+        return;
+
+    }
+
+
+    form.classList.remove("hidden");
+
+    noGroup.classList.add("hidden");
+
+
+    const paidBy =
+        document.getElementById(
+            "sharedExpensePaidBy"
+        );
+
+
+    paidBy.innerHTML =
+        group.people
+            .map(
+                person => `
+                    <option value="${person.id}">
+                        ${escapeHTML(person.name)}
+                    </option>
+                `
+            )
+            .join("");
+
+
+    renderSharedSplitRows();
+
+}
+
+
+/* ================================================================
+   SHARED SPLIT ROWS
+================================================================ */
+
+function renderSharedSplitRows(){
+
+    const groupId =
+        document.getElementById(
+            "sharedExpenseGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    const container =
+        document.getElementById(
+            "sharedSplitRows"
+        );
+
+
+    const method =
+        document.getElementById(
+            "sharedSplitMethod"
+        ).value;
+
+
+    if(!group){
+
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        group.people.map(
+            person => {
+
+                let input;
+
+
+                if(method === "equal"){
+
+                    input = `
+                        <div class="small muted">
+                            Equal share
+                        </div>
+                    `;
+
+                }
+
+
+                else if(method === "amount"){
+
+                    input = `
+                        <input
+                            class="shared-split-input"
+                            data-person-id="${person.id}"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="₹ 0"
+                        >
+                    `;
+
+                }
+
+
+                else if(method === "percentage"){
+
+                    input = `
+                        <input
+                            class="shared-split-input"
+                            data-person-id="${person.id}"
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            placeholder="0%"
+                        >
+                    `;
+
+                }
+
+
+                else{
+
+                    input = `
+                        <input
+                            class="shared-split-input"
+                            data-person-id="${person.id}"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value="1"
+                        >
+                    `;
+
+                }
+
+
+                return `
+
+                    <div class="split-row">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(person.name)}
+                            </strong>
+
+                        </div>
+
+                        <div>
+                            ${input}
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        ).join("");
+
+
+    updateSharedSplitSummary();
+
+    document
+        .querySelectorAll(
+            ".shared-split-input"
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                updateSharedSplitSummary
+            );
+
+        });
+
+}
+
+
+/* ================================================================
+   SHARED SPLIT CALCULATION
+================================================================ */
+
+function calculateSharedSplits(){
+
+    const groupId =
+        document.getElementById(
+            "sharedExpenseGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "sharedExpenseAmount"
+            ).value
+        ) || 0;
+
+
+    const method =
+        document.getElementById(
+            "sharedSplitMethod"
+        ).value;
+
+
+    if(!group){
+
+        return [];
+
+    }
+
+
+    if(method === "equal"){
+
+        const share =
+            group.people.length
+                ? amount /
+                  group.people.length
+                : 0;
+
+
+        return group.people.map(
+            person => ({
+
+                personId:
+                    person.id,
+
+                amount:
+                    roundMoney(share)
+
+            })
+        );
+
+    }
+
+
+    const inputs =
+        Array.from(
+            document.querySelectorAll(
+                ".shared-split-input"
+            )
+        );
+
+
+    if(method === "amount"){
+
+        return group.people.map(
+            person => {
+
+                const input =
+                    inputs.find(
+                        element =>
+                            element.dataset.personId ===
+                            person.id
+                    );
+
+
+                return {
+
+                    personId:
+                        person.id,
+
+                    amount:
+                        roundMoney(
+                            Number(
+                                input?.value
+                            ) || 0
+                        )
+
+                };
+
+            }
+        );
+
+    }
+
+
+    if(method === "percentage"){
+
+        return group.people.map(
+            person => {
+
+                const input =
+                    inputs.find(
+                        element =>
+                            element.dataset.personId ===
+                            person.id
+                    );
+
+
+                const percentage =
+                    Number(
+                        input?.value
+                    ) || 0;
+
+
+                return {
+
+                    personId:
+                        person.id,
+
+                    amount:
+                        roundMoney(
+                            amount *
+                            percentage /
+                            100
+                        )
+
+                };
+
+            }
+        );
+
+    }
+
+
+    if(method === "shares"){
+
+        const totalShares =
+            inputs.reduce(
+                (total,input) =>
+                    total +
+                    (
+                        Number(input.value) || 0
+                    ),
+                0
+            );
+
+
+        return group.people.map(
+            person => {
+
+                const input =
+                    inputs.find(
+                        element =>
+                            element.dataset.personId ===
+                            person.id
+                    );
+
+
+                const shares =
+                    Number(
+                        input?.value
+                    ) || 0;
+
+
+                return {
+
+                    personId:
+                        person.id,
+
+                    amount:
+                        totalShares > 0
+                            ? roundMoney(
+                                amount *
+                                shares /
+                                totalShares
+                            )
+                            : 0
+
+                };
+
+            }
+        );
+
+    }
+
+
+    return [];
+
+}
+
+
+function roundMoney(value){
+
+    return Math.round(
+        (Number(value) + Number.EPSILON) *
+        100
+    ) / 100;
+
+}
+
+
+function updateSharedSplitSummary(){
+
+    const summary =
+        document.getElementById(
+            "sharedSplitSummary"
+        );
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "sharedExpenseAmount"
+            ).value
+        ) || 0;
+
+
+    const method =
+        document.getElementById(
+            "sharedSplitMethod"
+        ).value;
+
+
+    if(!amount){
+
+        summary.textContent =
+            "Enter an expense amount.";
+
+        return;
+
+    }
+
+
+    const splits =
+        calculateSharedSplits();
+
+
+    const total =
+        splits.reduce(
+            (sum,split) =>
+                sum +
+                Number(split.amount || 0),
+            0
+        );
+
+
+    const difference =
+        roundMoney(
+            amount - total
+        );
+
+
+    if(method === "equal"){
+
+        summary.textContent =
+            `Each person: ${money(
+                splits[0]?.amount || 0
+            )}`;
+
+        return;
+
+    }
+
+
+    if(Math.abs(difference) < 0.01){
+
+        summary.innerHTML =
+            `<span class="good">
+                Split complete: ${money(total)}
+             </span>`;
+
+    }else{
+
+        summary.innerHTML =
+            `<span class="bad">
+                Split differs from expense by
+                ${money(Math.abs(difference))}
+             </span>`;
+
+    }
+
+}
+
+
+/* ================================================================
+   SAVE SHARED EXPENSE
+================================================================ */
+
+function saveSharedExpense(){
+
+    const groupId =
+        document.getElementById(
+            "sharedExpenseGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        alert(
+            "Please select a group."
+        );
+
+        return;
+
+    }
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "sharedExpenseAmount"
+            ).value
+        );
+
+
+    if(amount <= 0){
+
+        alert(
+            "Please enter an expense amount."
+        );
+
+        return;
+
+    }
+
+
+    const splits =
+        calculateSharedSplits();
+
+
+    const splitTotal =
+        roundMoney(
+            splits.reduce(
+                (sum,split) =>
+                    sum +
+                    Number(split.amount || 0),
+                0
+            )
+        );
+
+
+    if(
+        Math.abs(
+            amount - splitTotal
+        ) > 0.01
+    ){
+
+        alert(
+            `The split total is ${money(splitTotal)}, ` +
+            `but the expense is ${money(amount)}. ` +
+            `Please correct the split.`
+        );
+
+        return;
+
+    }
+
+
+    const expense = {
+
+        id:
+            editingSharedExpenseId ||
+            Date.now(),
+
+        amount,
+
+        date:
+            document.getElementById(
+                "sharedExpenseDate"
+            ).value ||
+            today(),
+
+        category:
+            document.getElementById(
+                "sharedExpenseCategory"
+            ).value
+            .trim() ||
+            "General",
+
+        paidBy:
+            document.getElementById(
+                "sharedExpensePaidBy"
+            ).value,
+
+        splitMethod:
+            document.getElementById(
+                "sharedSplitMethod"
+            ).value,
+
+        splits,
+
+        comment:
+            document.getElementById(
+                "sharedExpenseComment"
+            ).value
+            .trim()
+
+    };
+
+
+    const index =
+        group.expenses.findIndex(
+            item =>
+                item.id ===
+                editingSharedExpenseId
+        );
+
+
+    if(index >= 0){
+
+        group.expenses[index] =
+            expense;
+
+    }else{
+
+        group.expenses.push(
+            expense
+        );
+
+    }
+
+
+    saveAppData();
+
+
+    clearSharedExpenseForm();
+
+
+    alert(
+        "Shared expense saved."
+    );
+
+
+    showSharedTab(
+        "balances"
+    );
+
+
+    document.getElementById(
+        "balanceGroup"
+    ).value =
+        groupId;
+
+
+    renderSharedBalances();
+
+}
+
+
+/* ================================================================
+   CLEAR SHARED EXPENSE FORM
+================================================================ */
+
+function clearSharedExpenseForm(){
+
+    editingSharedExpenseId =
+        null;
+
+
+    document.getElementById(
+        "sharedExpenseAmount"
+    ).value = "";
+
+
+    document.getElementById(
+        "sharedExpenseCategory"
+    ).value = "";
+
+
+    document.getElementById(
+        "sharedExpenseComment"
+    ).value = "";
+
+
+    document.getElementById(
+        "sharedExpenseTitle"
+    ).textContent =
+        "Add Shared Expense";
+
+
+    document.getElementById(
+        "sharedExpenseDate"
+    ).value =
+        today();
+
+
+    renderSharedSplitRows();
+
+}
+
+
+/* ================================================================
+   SHARED BALANCE CALCULATION
+================================================================ */
+
+function calculateGroupBalances(group){
+
+    const balances = {};
+
+
+    group.people.forEach(
+        person => {
+
+            balances[person.id] = 0;
+
+        }
+    );
+
+
+    group.expenses.forEach(
+        expense => {
+
+            if(
+                balances[expense.paidBy] ===
+                undefined
+            ){
+
+                return;
+
+            }
+
+
+            balances[expense.paidBy] +=
+                Number(expense.amount) || 0;
+
+
+            expense.splits.forEach(
+                split => {
+
+                    if(
+                        balances[split.personId] ===
+                        undefined
+                    ){
+
+                        return;
+
+                    }
+
+
+                    balances[split.personId] -=
+                        Number(split.amount) || 0;
+
+                }
+            );
+
+        }
+    );
+
+
+    group.settlements.forEach(
+        settlement => {
+
+            if(
+                balances[settlement.from] ===
+                undefined ||
+                balances[settlement.to] ===
+                undefined
+            ){
+
+                return;
+
+            }
+
+
+            balances[settlement.from] +=
+                Number(settlement.amount) || 0;
+
+
+            balances[settlement.to] -=
+                Number(settlement.amount) || 0;
+
+        }
+    );
+
+
+    return balances;
+
+}
+
+
+/* ================================================================
+   RENDER BALANCES
+================================================================ */
+
+function renderSharedBalances(){
+
+    const groupId =
+        document.getElementById(
+            "balanceGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    const container =
+        document.getElementById(
+            "sharedBalanceList"
+        );
+
+
+    const debtsContainer =
+        document.getElementById(
+            "simplifiedDebts"
+        );
+
+
+    const settlementsContainer =
+        document.getElementById(
+            "settlementHistory"
+        );
+
+
+    if(!group){
+
+        container.innerHTML =
+            `<div class="empty">
+                Create a group first.
+             </div>`;
+
+        debtsContainer.innerHTML = "";
+
+        settlementsContainer.innerHTML = "";
+
+        return;
+
+    }
+
+
+    const balances =
+        calculateGroupBalances(
+            group
+        );
+
+
+    const total =
+        group.expenses.reduce(
+            (sum,expense) =>
+                sum +
+                Number(expense.amount || 0),
+            0
+        );
+
+
+    container.innerHTML = `
+
+        <div class="stat-grid">
+
+            <div class="stat">
+
+                <span>
+                    Group Expenses
+                </span>
+
+                <strong>
+                    ${money(total)}
+                </strong>
+
+            </div>
+
+            <div class="stat">
+
+                <span>
+                    People
+                </span>
+
+                <strong>
+                    ${group.people.length}
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:10px">
+
+            ${group.people.map(
+                person => {
+
+                    const balance =
+                        roundMoney(
+                            balances[person.id] || 0
+                        );
+
+
+                    return `
+
+                        <div class="row">
+
+                            <div class="row-flex">
+
+                                <div>
+                                    <strong>
+                                        ${escapeHTML(
+                                            person.name
+                                        )}
+                                    </strong>
+                                </div>
+
+                                <div class="${
+                                    balance >= 0
+                                        ? "balance-positive"
+                                        : "balance-negative"
+                                }">
+
+                                    ${
+                                        balance >= 0
+                                            ? "gets back "
+                                            : "owes "
+                                    }
+
+                                    ${money(
+                                        Math.abs(balance)
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            ).join("")}
+
+        </div>
+
+    `;
+
+
+    const transfers =
+        simplifyDebts(
+            balances
+        );
+
+
+    if(!transfers.length){
+
+        debtsContainer.innerHTML =
+            `<div class="empty">
+                Everyone is settled up.
+             </div>`;
+
+    }else{
+
+        debtsContainer.innerHTML =
+            transfers.map(
+                transfer => `
+
+                    <div class="row">
+
+                        <div class="row-flex">
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        getPersonName(
+                                            group,
+                                            transfer.from
+                                        )
+                                    )}
+                                </strong>
+
+                                <div class="small muted">
+                                    pays
+                                </div>
+
+                            </div>
+
+                            <div>
+                                →
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHTML(
+                                        getPersonName(
+                                            group,
+                                            transfer.to
+                                        )
+                                    )}
+                                </strong>
+
+                                <div class="small good">
+                                    ${money(
+                                        transfer.amount
+                                    )}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `
+            ).join("");
+
+    }
+
+
+    if(!group.settlements.length){
+
+        settlementsContainer.innerHTML =
+            `<div class="empty">
+                No settlements recorded.
+             </div>`;
+
+    }else{
+
+        settlementsContainer.innerHTML =
+            [...group.settlements]
+                .reverse()
+                .map(
+                    settlement => `
+
+                        <div class="row">
+
+                            <div class="row-flex">
+
+                                <div>
+
+                                    <strong>
+                                        ${escapeHTML(
+                                            getPersonName(
+                                                group,
+                                                settlement.from
+                                            )
+                                        )}
+                                        →
+                                        ${escapeHTML(
+                                            getPersonName(
+                                                group,
+                                                settlement.to
+                                            )
+                                        )}
+                                    </strong>
+
+                                    <div class="small muted">
+                                        ${escapeHTML(
+                                            settlement.date
+                                        )}
+
+                                        ${
+                                            settlement.comment
+                                                ? " · " +
+                                                  escapeHTML(
+                                                      settlement.comment
+                                                  )
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                                <strong>
+                                    ${money(
+                                        settlement.amount
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    `
+                ).join("");
+
+    }
+
+}
+
+
+/* ================================================================
+   PERSON NAME
+================================================================ */
+
+function getPersonName(
+    group,
+    personId
+){
+
+    const person =
+        group.people.find(
+            item =>
+                item.id === personId
+        );
+
+
+    return person
+        ? person.name
+        : "Unknown";
+
+}
+
+
+/* ================================================================
+   DEBT SIMPLIFICATION
+================================================================ */
+
+function simplifyDebts(
+    balances
+){
+
+    const creditors = [];
+
+    const debtors = [];
+
+
+    Object.entries(
+        balances
+    ).forEach(
+        ([personId,balance]) => {
+
+            const value =
+                roundMoney(balance);
+
+
+            if(value > 0.01){
+
+                creditors.push({
+
+                    id:personId,
+
+                    amount:value
+
+                });
+
+            }
+
+
+            else if(value < -0.01){
+
+                debtors.push({
+
+                    id:personId,
+
+                    amount:-value
+
+                });
+
+            }
+
+        }
+    );
+
+
+    creditors.sort(
+        (a,b) =>
+            b.amount - a.amount
+    );
+
+
+    debtors.sort(
+        (a,b) =>
+            b.amount - a.amount
+    );
+
+
+    const result = [];
+
+
+    let creditorIndex = 0;
+
+    let debtorIndex = 0;
+
+
+    while(
+        creditorIndex < creditors.length &&
+        debtorIndex < debtors.length
+    ){
+
+        const creditor =
+            creditors[creditorIndex];
+
+
+        const debtor =
+            debtors[debtorIndex];
+
+
+        const amount =
+            roundMoney(
+                Math.min(
+                    creditor.amount,
+                    debtor.amount
+                )
+            );
+
+
+        if(amount > 0){
+
+            result.push({
+
+                from:
+                    debtor.id,
+
+                to:
+                    creditor.id,
+
+                amount
+
+            });
+
+        }
+
+
+        creditor.amount =
+            roundMoney(
+                creditor.amount - amount
+            );
+
+
+        debtor.amount =
+            roundMoney(
+                debtor.amount - amount
+            );
+
+
+        if(
+            creditor.amount <= 0.01
+        ){
+
+            creditorIndex++;
+
+        }
+
+
+        if(
+            debtor.amount <= 0.01
+        ){
+
+            debtorIndex++;
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+/* ================================================================
+   RECORD SETTLEMENT
+================================================================ */
+
+function recordSharedSettlement(){
+
+    const groupId =
+        document.getElementById(
+            "balanceGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return;
+
+    }
+
+
+    if(group.people.length < 2){
+
+        alert(
+            "A settlement requires at least two people."
+        );
+
+        return;
+
+    }
+
+
+    const fromNames =
+        group.people
+            .map(
+                (person,index) =>
+                    `${index + 1}. ${person.name}`
+            )
+            .join("\n");
+
+
+    const fromAnswer =
+        prompt(
+            "Who paid the settlement?\n\n" +
+            fromNames
+        );
+
+
+    const fromIndex =
+        Number(fromAnswer) - 1;
+
+
+    if(
+        !Number.isInteger(fromIndex) ||
+        !group.people[fromIndex]
+    ){
+
+        return;
+
+    }
+
+
+    const toAnswer =
+        prompt(
+            "Who received the settlement?\n\n" +
+            fromNames
+        );
+
+
+    const toIndex =
+        Number(toAnswer) - 1;
+
+
+    if(
+        !Number.isInteger(toIndex) ||
+        !group.people[toIndex] ||
+        toIndex === fromIndex
+    ){
+
+        alert(
+            "Please select two different people."
+        );
+
+        return;
+
+    }
+
+
+    const amount =
+        Number(
+            prompt(
+                "Settlement amount (₹):"
+            )
+        );
+
+
+    if(amount <= 0){
+
+        return;
+
+    }
+
+
+    const comment =
+        prompt(
+            "Comment (optional):"
+        ) || "";
+
+
+    group.settlements.push({
+
+        id:
+            Date.now(),
+
+        from:
+            group.people[fromIndex].id,
+
+        to:
+            group.people[toIndex].id,
+
+        amount:
+            roundMoney(amount),
+
+        date:
+            today(),
+
+        comment:
+            comment.trim()
+
+    });
+
+
+    saveAppData();
+
+
+    renderSharedBalances();
+
+}
+
+
+/* ================================================================
+   SHARED CSV EXPORT
+================================================================ */
+
+function exportSharedCSV(){
+
+    const groupId =
+        document.getElementById(
+            "sharedDataGroup"
+        ).value;
+
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        alert(
+            "Please select a group."
+        );
+
+        return;
+
+    }
+
+
+    const rows = [
+
+        [
+            "RecordType",
+            "Group",
+            "Date",
+            "Amount",
+            "Category",
+            "PaidBy",
+            "SplitMethod",
+            "Person",
+            "SplitAmount",
+            "Comment",
+            "From",
+            "To"
+        ]
+
+    ];
+
+
+    group.expenses.forEach(
+        expense => {
+
+            expense.splits.forEach(
+                split => {
+
+                    rows.push([
+
+                        "EXPENSE",
+
+                        group.name,
+
+                        expense.date,
+
+                        expense.amount,
+
+                        expense.category,
+
+                        getPersonName(
+                            group,
+                            expense.paidBy
+                        ),
+
+                        expense.splitMethod,
+
+                        getPersonName(
+                            group,
+                            split.personId
+                        ),
+
+                        split.amount,
+
+                        expense.comment,
+
+                        "",
+
+                        ""
+
+                    ]);
+
+                }
+            );
+
+        }
+    );
+
+
+    group.settlements.forEach(
+        settlement => {
+
+            rows.push([
+
+                "SETTLEMENT",
+
+                group.name,
+
+                settlement.date,
+
+                settlement.amount,
+
+                "",
+
+                "",
+
+                "",
+
+                "",
+
+                "",
+
+                settlement.comment,
+
+                getPersonName(
+                    group,
+                    settlement.from
+                ),
+
+                getPersonName(
+                    group,
+                    settlement.to
+                )
+
+            ]);
+
+        }
+    );
+
+
+    const csv =
+        rows
+            .map(
+                row =>
+                    row
+                        .map(csvEscape)
+                        .join(",")
+            )
+            .join("\r\n");
+
+
+    downloadCSV(
+        csv,
+        (
+            group.name
+                .replace(/[^a-z0-9]+/gi,"_")
+                .replace(/^_|_$/g,"") ||
+            "shared-expenses"
+        ) +
+        ".csv"
+    );
+
+}
+
+
+/* ================================================================
+   SHARED CSV IMPORT
+================================================================ */
+
+function importSharedCSV(event){
+
+    const file =
+        event.target.files[0];
+
+
+    if(!file){
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(){
+
+            try{
+
+                const rows =
+                    parseCSV(
+                        reader.result
+                    );
+
+
+                if(rows.length < 2){
+
+                    throw new Error(
+                        "CSV is empty."
+                    );
+
+                }
+
+
+                const headers =
+                    rows.shift();
+
+
+                const index =
+                    name =>
+                        headers.indexOf(name);
+
+
+                const groupNameFromFile =
+                    rows[0]?.[
+                        index("Group")
+                    ];
+
+
+                let group =
+                    Object.values(
+                        appData.shared.groups
+                    ).find(
+                        item =>
+                            item.name ===
+                            groupNameFromFile
+                    );
+
+
+                if(!group){
+
+                    const create =
+                        confirm(
+                            `The group "${groupNameFromFile || "Imported Group"}" ` +
+                            `does not exist.\n\nCreate it?`
+                        );
+
+
+                    if(!create){
+
+                        return;
+
+                    }
+
+
+                    const id =
+                        "group_" +
+                        Date.now();
+
+
+                    group = {
+
+                        id,
+
+                        name:
+                            groupNameFromFile ||
+                            "Imported Group",
+
+                        description:
+                            "Imported from CSV",
+
+                        people:[],
+
+                        expenses:[],
+
+                        settlements:[]
+
+                    };
+
+
+                    appData.shared.groups[id] =
+                        group;
+
+                }
+
+
+                const peopleByName =
+                    {};
+
+
+                group.people.forEach(
+                    person => {
+
+                        peopleByName[
+                            person.name
+                                .toLowerCase()
+                        ] =
+                            person.id;
+
+                    }
+                );
+
+
+                function getOrCreatePerson(
+                    name
+                ){
+
+                    const clean =
+                        String(
+                            name || ""
+                        ).trim();
+
+
+                    if(!clean){
+
+                        return null;
+
+                    }
+
+
+                    const key =
+                        clean.toLowerCase();
+
+
+                    if(
+                        peopleByName[key]
+                    ){
+
+                        return peopleByName[key];
+
+                    }
+
+
+                    const person = {
+
+                        id:
+                            "person_" +
+                            Date.now() +
+                            "_" +
+                            Math.random(),
+
+                        name:
+                            clean
+
+                    };
+
+
+                    group.people.push(
+                        person
+                    );
+
+
+                    peopleByName[key] =
+                        person.id;
+
+
+                    return person.id;
+
+                }
+
+
+                const importedExpenses = {};
+
+
+                rows.forEach(
+                    row => {
+
+                        const type =
+                            row[
+                                index(
+                                    "RecordType"
+                                )
+                            ];
+
+
+                        if(type === "EXPENSE"){
+
+                            const date =
+                                row[
+                                    index("Date")
+                                ];
+
+
+                            const amount =
+                                Number(
+                                    row[
+                                        index("Amount")
+                                    ]
+                                ) || 0;
+
+
+                            const category =
+                                row[
+                                    index("Category")
+                                ] ||
+                                "General";
+
+
+                            const paidByName =
+                                row[
+                                    index("PaidBy")
+                                ];
+
+
+                            const paidBy =
+                                getOrCreatePerson(
+                                    paidByName
+                                );
+
+
+                            const splitMethod =
+                                row[
+                                    index(
+                                        "SplitMethod"
+                                    )
+                                ] ||
+                                "amount";
+
+
+                            const personName =
+                                row[
+                                    index(
+                                        "Person"
+                                    )
+                                ];
+
+
+                            const personId =
+                                getOrCreatePerson(
+                                    personName
+                                );
+
+
+                            const splitAmount =
+                                Number(
+                                    row[
+                                        index(
+                                            "SplitAmount"
+                                        )
+                                    ]
+                                ) || 0;
+
+
+                            const comment =
+                                row[
+                                    index(
+                                        "Comment"
+                                    )
+                                ] || "";
+
+
+                            const key =
+                                [
+                                    date,
+                                    amount,
+                                    category,
+                                    paidByName,
+                                    comment
+                                ].join("|");
+
+
+                            if(
+                                !importedExpenses[key]
+                            ){
+
+                                importedExpenses[key] = {
+
+                                    id:
+                                        Date.now() +
+                                        Math.random(),
+
+                                    amount,
+
+                                    date,
+
+                                    category,
+
+                                    paidBy,
+
+                                    splitMethod,
+
+                                    splits:[],
+
+                                    comment
+
+                                };
+
+                            }
+
+
+                            if(personId){
+
+                                importedExpenses[
+                                    key
+                                ].splits.push({
+
+                                    personId,
+
+                                    amount:
+                                        splitAmount
+
+                                });
+
+                            }
+
+                        }
+
+
+                        else if(
+                            type ===
+                            "SETTLEMENT"
+                        ){
+
+                            const from =
+                                getOrCreatePerson(
+                                    row[
+                                        index(
+                                            "From"
+                                        )
+                                    ]
+                                );
+
+
+                            const to =
+                                getOrCreatePerson(
+                                    row[
+                                        index(
+                                            "To"
+                                        )
+                                    ]
+                                );
+
+
+                            const amount =
+                                Number(
+                                    row[
+                                        index(
+                                            "Amount"
+                                        )
+                                    ]
+                                ) || 0;
+
+
+                            if(
+                                from &&
+                                to &&
+                                amount > 0
+                            ){
+
+                                group.settlements.push({
+
+                                    id:
+                                        Date.now() +
+                                        Math.random(),
+
+                                    from,
+
+                                    to,
+
+                                    amount,
+
+                                    date:
+                                        row[
+                                            index(
+                                                "Date"
+                                            )
+                                        ] ||
+                                        today(),
+
+                                    comment:
+                                        row[
+                                            index(
+                                                "Comment"
+                                            )
+                                        ] || ""
+
+                                });
+
+                            }
+
+                        }
+
+                    }
+                );
+
+
+                Object.values(
+                    importedExpenses
+                ).forEach(
+                    expense => {
+
+                        const existing =
+                            group.expenses.some(
+                                item =>
+                                    item.date ===
+                                    expense.date &&
+                                    item.amount ===
+                                    expense.amount &&
+                                    item.category ===
+                                    expense.category &&
+                                    item.paidBy ===
+                                    expense.paidBy &&
+                                    item.comment ===
+                                    expense.comment
+                            );
+
+
+                        if(!existing){
+
+                            group.expenses.push(
+                                expense
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                saveAppData();
+
+
+                populateSharedGroups();
+
+                populateSharedExpenseGroups();
+
+                populateBalanceGroups();
+
+                populateSharedDataGroups();
+
+
+                alert(
+                    "Shared CSV imported successfully."
+                );
+
+
+                showSharedTab(
+                    "groups"
+                );
+
+            }catch(error){
+
+                console.error(error);
+
+                alert(
+                    "Could not import the shared CSV."
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(
+        file
+    );
+
+}
+
+
+/* ================================================================
+   SHARED EXPENSE EDIT / DELETE
+================================================================ */
+
+function editSharedExpense(
+    groupId,
+    expenseId
+){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return;
+
+    }
+
+
+    const expense =
+        group.expenses.find(
+            item =>
+                item.id === expenseId
+        );
+
+
+    if(!expense){
+
+        return;
+
+    }
+
+
+    editingSharedExpenseId =
+        expenseId;
+
+
+    showSharedTab(
+        "expense"
+    );
+
+
+    document.getElementById(
+        "sharedExpenseGroup"
+    ).value =
+        groupId;
+
+
+    loadSharedGroupPeople();
+
+
+    document.getElementById(
+        "sharedExpenseAmount"
+    ).value =
+        expense.amount;
+
+
+    document.getElementById(
+        "sharedExpenseDate"
+    ).value =
+        expense.date;
+
+
+    document.getElementById(
+        "sharedExpenseCategory"
+    ).value =
+        expense.category;
+
+
+    document.getElementById(
+        "sharedExpensePaidBy"
+    ).value =
+        expense.paidBy;
+
+
+    document.getElementById(
+        "sharedSplitMethod"
+    ).value =
+        expense.splitMethod;
+
+
+    document.getElementById(
+        "sharedExpenseComment"
+    ).value =
+        expense.comment || "";
+
+
+    renderSharedSplitRows();
+
+
+    const inputs =
+        document.querySelectorAll(
+            ".shared-split-input"
+        );
+
+
+    expense.splits.forEach(
+        split => {
+
+            const input =
+                Array.from(inputs)
+                    .find(
+                        element =>
+                            element.dataset.personId ===
+                            split.personId
+                    );
+
+
+            if(!input){
+
+                return;
+
+            }
+
+
+            if(
+                expense.splitMethod ===
+                "amount"
+            ){
+
+                input.value =
+                    split.amount;
+
+            }
+
+
+            else if(
+                expense.splitMethod ===
+                "percentage"
+            ){
+
+                const percentage =
+                    expense.amount > 0
+                        ? (
+                            split.amount /
+                            expense.amount *
+                            100
+                        )
+                        : 0;
+
+
+                input.value =
+                    roundMoney(
+                        percentage
+                    );
+
+            }
+
+        }
+    );
+
+
+    updateSharedSplitSummary();
+
+
+    document.getElementById(
+        "sharedExpenseTitle"
+    ).textContent =
+        "Edit Shared Expense";
+
+}
+
+
+function deleteSharedExpense(
+    groupId,
+    expenseId
+){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return;
+
+    }
+
+
+    if(
+        !confirm(
+            "Delete this shared expense?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    group.expenses =
+        group.expenses.filter(
+            expense =>
+                expense.id !==
+                expenseId
+        );
+
+
+    saveAppData();
+
+
+    renderSharedBalances();
+
+}
+
+
+/* ================================================================
+   OPTIONAL SHARED EXPENSE HISTORY
+================================================================ */
+
+function renderSharedExpenseHistory(
+    groupId
+){
+
+    const group =
+        appData.shared.groups[groupId];
+
+
+    if(!group){
+
+        return "";
+
+    }
+
+
+    return group.expenses
+        .slice()
+        .reverse()
+        .map(
+            expense => `
+
+                <div class="row">
+
+                    <div class="row-flex">
+
+                        <div>
+
+                            <strong>
+                                ${escapeHTML(
+                                    expense.category
+                                )}
+                            </strong>
+
+                            <div class="small muted">
+
+                                ${escapeHTML(
+                                    expense.date
+                                )}
+
+                                · Paid by
+                                ${escapeHTML(
+                                    getPersonName(
+                                        group,
+                                        expense.paidBy
+                                    )
+                                )}
+
+                            </div>
+
+                            ${
+                                expense.comment
+                                    ? `
+                                        <div class="small muted">
+                                            ${escapeHTML(
+                                                expense.comment
+                                            )}
+                                        </div>
+                                      `
+                                    : ""
+                            }
+
+                        </div>
+
+
+                        <div style="text-align:right">
+
+                            <strong>
+                                ${money(
+                                    expense.amount
+                                )}
+                            </strong>
+
+                            <div class="actions">
+
+                                <button
+                                    class="secondary"
+                                    onclick="editSharedExpense(
+                                        '${group.id}',
+                                        ${expense.id}
+                                    )"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="danger"
+                                    onclick="deleteSharedExpense(
+                                        '${group.id}',
+                                        ${expense.id}
+                                    )"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `
+        ).join("");
+
+}
+
+
+/* ================================================================
+   SECURITY / LOCAL STORAGE INFORMATION
+================================================================ */
+
+function showSecurityInfo(){
+
+    alert(
+        "Your budget data is stored locally on this device " +
+        "using browser localStorage. The app does not send " +
+        "your expense data to a cloud server. Your PIN is stored " +
+        "as a SHA-256 hash rather than plain text."
+    );
+
+}
+
+
+/* ================================================================
+   APPLICATION STARTUP
+================================================================ */
+
+function initialiseApp(){
+
+    ensurePersonalMonth(
+        currentPersonalMonth
+    );
+
+
+    const pinHash =
+        localStorage.getItem(
+            "my_budget_pin_hash"
+        );
+
+
+    if(pinHash){
+
+        document
+            .getElementById(
+                "pinSetup"
+            )
+            .classList.add("hidden");
+
+
+        document
+            .getElementById(
+                "pinLogin"
+            )
+            .classList.remove("hidden");
+
+    }else{
+
+        document
+            .getElementById(
+                "pinSetup"
+            )
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById(
+                "pinLogin"
+            )
+            .classList.add("hidden");
+
+    }
+
+
+    if(
+        sessionStorage.getItem(
+            "my_budget_unlocked"
+        ) === "true"
+    ){
+
+        showApplication();
+
+    }
+
+}
+
+
+/* ================================================================
+   AUTO UPDATE SPLIT SUMMARY
+================================================================ */
+
+document.addEventListener(
+    "input",
+    function(event){
+
+        if(
+            event.target &&
+            (
+                event.target.id ===
+                "sharedExpenseAmount" ||
+                event.target.classList.contains(
+                    "shared-split-input"
+                )
+            )
+        ){
+
+            updateSharedSplitSummary();
+
+        }
+
+    }
+);
+
+
+/* ================================================================
+   INITIALISE
+================================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initialiseApp
+);
+
+</script>
+
+</body>
+</html>      
