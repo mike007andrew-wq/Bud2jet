@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<meta name="theme-color" content="#111827">
+
+<title>My Budget</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f5f7fb;
+    color: #111827;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.container {
+    max-width: 760px;
+    margin: auto;
+    padding: 16px 14px 60px;
+}
+
+h1 {
+    margin: 4px 0;
+    font-size: 30px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.muted {
+    color: #6b7280;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 3px 18px rgba(0,0,0,.06);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d7dce5;
+    border-radius: 12px;
+    font-size: 16px;
+    background: white;
+}
+
+button {
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #111827;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+button.secondary {
+    background: #eef0f5;
+    color: #111827;
+}
+
+button.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin: 14px 0;
+}
+
+.nav button {
+    background: white;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    padding: 10px 4px;
+}
+
+.nav button.active {
+    background: #111827;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 8px;
+}
+
+.stat {
+    background: #f7f8fb;
+    padding: 12px;
+    border-radius: 14px;
+}
+
+.stat span {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.stat b {
+    display: block;
+    font-size: 18px;
+    margin-top: 4px;
+}
+
+.row {
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.row:last-child {
+    border-bottom: 0;
+}
+
+.category-head,
+.expense {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.bar {
+    height: 8px;
+    background: #edf0f4;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 7px;
+}
+
+.fill {
+    height: 100%;
+    background: #6366f1;
+}
+
+.small {
+    font-size: 12px;
+}
+
+.good {
+    color: #15803d;
+}
+
+.bad {
+    color: #dc2626;
+}
+
+.empty {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+}
+
+.chip {
+    display: inline-block;
+    background: #eef0f5;
+    border-radius: 99px;
+    padding: 4px 7px;
+    font-size: 10px;
+}
+
+.person {
+    display: grid;
+    grid-template-columns: 1fr 120px 35px;
+    gap: 6px;
+    margin: 7px 0;
+}
+
+#lockScreen {
+    position: fixed;
+    inset: 0;
+    background: #f5f7fb;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.lockBox {
+    width: min(420px,100%);
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.12);
+}
+
+.error {
+    color: #dc2626;
+    min-height: 20px;
+    font-size: 13px;
+}
+
+@media(max-width:520px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .person {
+        grid-template-columns: 1fr 100px 35px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SECURITY SCREEN -->
+
+<div id="lockScreen">
+
+<div class="lockBox">
+
+<h2>🔒 My Budget</h2>
+
+<p class="muted">
+Your expense data is stored locally on this device.
+</p>
+
+<div id="pinSetup">
+
+<label>CREATE APP PIN</label>
+
+<input
+    id="pin1"
+    type="password"
+    inputmode="numeric"
+    maxlength="8"
+    placeholder="4–8 digits">
+
+<br><br>
+
+<label>CONFIRM PIN</label>
+
+<input
+    id="pin2"
+    type="password"
+    inputmode="numeric"
+    maxlength="8">
+
+<button
+    style="width:100%;margin-top:12px"
+    onclick="createPIN()">
+
+Enable App Lock
+
+</button>
+
+</div>
+
+<div id="pinLogin" class="hidden">
+
+<label>ENTER APP PIN</label>
+
+<input
+    id="pinInput"
+    type="password"
+    inputmode="numeric"
+    maxlength="8">
+
+<button
+    style="width:100%;margin-top:12px"
+    onclick="unlockApp()">
+
+Unlock
+
+</button>
+
+</div>
+
+<div id="pinError" class="error"></div>
+
+<p class="small muted">
+Keep your PIN private.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="container">
+
+<h1>My Budget</h1>
+
+<div class="muted">
+Personal expense tracker · INR
+</div>
+
+
+<!-- NAVIGATION -->
+
+<div class="nav">
+
+<button
+id="navDashboard"
+onclick="showTab('dashboard')">
+
+Dashboard
+
+</button>
+
+<button
+id="navExpense"
+onclick="showTab('expense')">
+
++ Expense
+
+</button>
+
+<button
+id="navHistory"
+onclick="showTab('history')">
+
+History
+
+</button>
+
+<button
+id="navData"
+onclick="showTab('data')">
+
+Data
+
+</button>
+
+</div>
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard">
+
+<div class="card">
+
+<div class="grid">
+
+<div>
+
+<label>MONTH</label>
+
+<input
+id="month"
+type="month">
+
+</div>
+
+<div>
+
+<label>ITERATION</label>
+
+<select id="iteration"></select>
+
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="createIteration()">
++ New Iteration
+</button>
+
+<button
+class="secondary"
+onclick="renameIteration()">
+
+Rename
+
+</button>
+
+<button
+class="danger"
+onclick="deleteIteration()">
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="grid">
+
+<div>
+
+<label>SALARY (₹)</label>
+
+<input
+id="salary"
+type="number"
+min="0"
+onchange="saveSalary()">
+
+</div>
+
+<div>
+
+<label>ITERATION</label>
+
+<input
+id="iterationName"
+disabled>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="stats">
+
+<div class="stat">
+
+<span>Salary</span>
+
+<b id="statSalary">
+₹0
+</b>
+
+</div>
+
+<div class="stat">
+
+<span>Budgeted</span>
+
+<b id="statBudget">
+₹0
+</b>
+
+</div>
+
+<div class="stat">
+
+<span>Your actual</span>
+
+<b id="statActual">
+₹0
+</b>
+
+</div>
+
+<div class="stat">
+
+<span>Remaining</span>
+
+<b id="statRemaining">
+₹0
+</b>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Budget vs Actual</h2>
+
+<div id="categoryView"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Recent Expenses</h2>
+
+<div id="recentExpenses"></div>
+
+</div>
+
+</section>
+
+
+<!-- ADD EXPENSE -->
+
+<section
+id="expense"
+class="hidden">
+
+<div class="card">
+
+<h2 id="expenseFormTitle">
+Add Expense
+</h2>
+
+
+<div class="grid">
+
+<div>
+
+<label>AMOUNT (₹)</label>
+
+<input
+id="expenseAmount"
+type="number"
+min="0">
+
+</div>
+
+<div>
+
+<label>DATE</label>
+
+<input
+id="expenseDate"
+type="date">
+
+</div>
+
+</div>
+
+
+<div style="margin-top:10px">
+
+<label>CATEGORY</label>
+
+<select id="expenseCategory"></select>
+
+</div>
+
+
+<div style="margin-top:10px">
+
+<label>PAYMENT METHOD</label>
+
+<select id="paymentMethod">
+
+<option>UPI</option>
+<option>Cash</option>
+<option>Debit Card</option>
+<option>Credit Card</option>
+<option>Bank Transfer</option>
+
+</select>
+
+</div>
+
+
+<div style="margin-top:10px">
+
+<label>EXPENSE TYPE</label>
+
+<select
+id="expenseType"
+onchange="toggleShared()">
+
+<option value="personal">
+Personal
+</option>
+
+<option value="shared">
+Shared
+</option>
+
+</select>
+
+</div>
+
+
+<!-- SHARED EXPENSE -->
+
+<div
+id="sharedPanel"
+class="hidden">
+
+<label>CONTRIBUTORS</label>
+
+<div id="contributors"></div>
+
+<button
+class="secondary"
+onclick="addContributor()">
+
++ Add Person
+
+</button>
+
+<div
+class="small"
+style="margin-top:8px">
+
+Contributor amounts must equal
+the group expense.
+
+</div>
+
+<b id="contributorTotal">
+Total: ₹0
+</b>
+
+</div>
+
+
+<div style="margin-top:10px">
+
+<label>DESCRIPTION</label>
+
+<input
+id="expenseDescription"
+placeholder="e.g. Hotel booking">
+
+</div>
+
+
+<div class="actions">
+
+<button onclick="saveExpense()">
+Save Expense
+</button>
+
+<button
+class="secondary"
+onclick="clearExpenseForm()">
+
+Clear
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- HISTORY -->
+
+<section
+id="history"
+class="hidden">
+
+<div class="card">
+
+<h2>Expense History</h2>
+
+
+<div class="grid">
+
+<div>
+
+<label>CATEGORY</label>
+
+<select
+id="filterCategory"
+onchange="renderHistory()">
+
+<option value="">
+All
+</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label>SEARCH</label>
+
+<input
+id="searchExpense"
+oninput="renderHistory()"
+placeholder="Search">
+
+</div>
+
+</div>
+
+
+<div id="historyList"></div>
+
+</div>
+
+</section>
+
+
+<!-- DATA -->
+
+<section
+id="data"
+class="hidden">
+
+<div class="card">
+
+<h2>Data & Backup</h2>
+
+<p class="small muted">
+
+CSV files are readable in Excel,
+Numbers and Google Sheets.
+
+You can also import a CSV previously
+exported by this app.
+
+</p>
+
+
+<div class="actions">
+
+<button onclick="exportCSV()">
+📊 Export CSV
+</button>
+
+<button
+class="secondary"
+onclick="document.getElementById('csvFile').click()">
+
+📥 Import CSV
+
+</button>
+
+</div>
+
+
+<input
+id="csvFile"
+type="file"
+accept=".csv"
+class="hidden"
+onchange="importCSV(event)">
+
+
+<div class="actions">
+
+<button onclick="exportEncryptedBackup()">
+🔐 Encrypted Backup
+</button>
+
+<button
+class="secondary"
+onclick="document.getElementById('backupFile').click()">
+
+🔐 Restore Backup
+
+</button>
+
+</div>
+
+
+<input
+id="backupFile"
+type="file"
+accept=".mbbackup"
+class="hidden"
+onchange="importEncryptedBackup(event)">
+
+
+<p class="small muted">
+
+Encrypted backups require a separate
+backup password.
+
+</p>
+
+</div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* ==============================
+   BUDGET SETTINGS
+============================== */
+
+const CATEGORIES = [
+
+["Home Expenses",35],
+
+["Vehicle Expenses",15],
+
+["Investments",25],
+
+["Entertainment",15],
+
+["Buffer Fund",10]
+
+];
+
+
+const DB_KEY = "myBudgetDatabaseV1";
+
+const PIN_KEY = "myBudgetPIN";
+
+let database =
+JSON.parse(
+localStorage.getItem(DB_KEY)
+||
+'{"months":{}}'
+);
+
+let currentMonth =
+new Date()
+.toISOString()
+.slice(0,7);
+
+let currentIteration = "";
+
+let editingExpenseId = null;
+
+
+/* ==============================
+   INITIALIZE
+============================== */
+
+CATEGORIES.forEach(category => {
+
+document.getElementById(
+"expenseCategory"
+).innerHTML +=
+
+`<option>${category[0]}</option>`;
+
+document.getElementById(
+"filterCategory"
+).innerHTML +=
+
+`<option>${category[0]}</option>`;
+
+});
+
+
+function ensureMonth(month) {
+
+if (!database.months[month]) {
+
+database.months[month] = {
+
+iterations: {
+
+Default: {
+
+salary:0,
+
+expenses:[]
+
+}
+
+}
+
+};
+
+}
+
+return database.months[month];
+
+}
+
+
+function currentData() {
+
+return ensureMonth(currentMonth)
+.iterations[currentIteration];
+
+}
+
+
+function saveDatabase() {
+
+localStorage.setItem(
+DB_KEY,
+JSON.stringify(database)
+);
+
+}
+
+
+/* ==============================
+   FORMATTING
+============================== */
+
+function INR(value) {
+
+return new Intl.NumberFormat(
+"en-IN",
+{
+style:"currency",
+currency:"INR",
+maximumFractionDigits:0
+}
+).format(Number(value)||0);
+
+}
+
+
+function escapeHTML(value) {
+
+return String(value ?? "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* ==============================
+   NAVIGATION
+============================== */
+
+function showTab(tab) {
+
+["dashboard","expense","history","data"]
+.forEach(id => {
+
+document.getElementById(id)
+.classList.toggle(
+"hidden",
+id !== tab
+);
+
+});
+
+
+["Dashboard","Expense","History","Data"]
+.forEach(name => {
+
+document.getElementById(
+"nav"+name
+).classList.toggle(
+"active",
+name.toLowerCase() === tab
+);
+
+});
+
+}
+
+
+/* ==============================
+   MONTHS / ITERATIONS
+============================== */
+
+function loadIterations() {
+
+let monthData =
+ensureMonth(currentMonth);
+
+let names =
+Object.keys(
+monthData.iterations
+);
+
+if (
+!currentIteration ||
+!monthData.iterations[currentIteration]
+) {
+
+currentIteration = names[0];
+
+}
+
+let select =
+document.getElementById("iteration");
+
+select.innerHTML =
+names.map(name =>
+`<option value="${escapeHTML(name)}">
+${escapeHTML(name)}
+</option>`
+).join("");
+
+select.value =
+currentIteration;
+
+}
+
+
+document.getElementById(
+"month"
+).addEventListener(
+"change",
+function() {
+
+currentMonth = this.value;
+
+currentIteration = "";
+
+loadIterations();
+
+render();
+
+});
+
+
+document.getElementById(
+"iteration"
+).addEventListener(
+"change",
+function() {
+
+currentIteration =
+this.value;
+
+render();
+
+});
+
+
+function createIteration() {
+
+let name =
+prompt(
+"Enter an iteration name:"
+);
+
+if (!name) return;
+
+name = name.trim();
+
+if (!name) return;
+
+let monthData =
+ensureMonth(currentMonth);
+
+if (monthData.iterations[name]) {
+
+alert(
+"That iteration already exists."
+);
+
+return;
+
+}
+
+monthData.iterations[name] = {
+
+salary:0,
+
+expenses:[]
+
+};
+
+currentIteration = name;
+
+saveDatabase();
+
+loadIterations();
+
+render();
+
+}
+
+
+function renameIteration() {
+
+let newName =
+prompt(
+"New iteration name:",
+currentIteration
+);
+
+if (!newName) return;
+
+newName = newName.trim();
+
+if (
+!newName ||
+newName === currentIteration
+) return;
+
+let monthData =
+ensureMonth(currentMonth);
+
+if (monthData.iterations[newName]) {
+
+alert(
+"That name already exists."
+);
+
+return;
+
+}
+
+monthData.iterations[newName] =
+monthData.iterations[currentIteration];
+
+delete monthData.iterations[currentIteration];
+
+currentIteration = newName;
+
+saveDatabase();
+
+loadIterations();
+
+render();
+
+}
+
+
+function deleteIteration() {
+
+let monthData =
+ensureMonth(currentMonth);
+
+let names =
+Object.keys(
+monthData.iterations
+);
+
+if (names.length === 1) {
+
+alert(
+"At least one iteration must remain."
+);
+
+return;
+
+}
+
+if (
+confirm(
+"Delete this iteration and all its expenses?"
+)
+) {
+
+delete monthData.iterations[
+currentIteration
+];
+
+currentIteration =
+Object.keys(
+monthData.iterations
+)[0];
+
+saveDatabase();
+
+loadIterations();
+
+render();
+
+}
+
+}
+
+
+/* ==============================
+   SALARY
+============================== */
+
+function saveSalary() {
+
+currentData().salary =
+Number(
+document.getElementById("salary").value
+)||0;
+
+saveDatabase();
+
+render();
+
+}
+
+
+/* ==============================
+   DASHBOARD
+============================== */
+
+function render() {
+
+let data = currentData();
+
+let salary =
+Number(data.salary)||0;
+
+let actual =
+data.expenses.reduce(
+(sum,expense) =>
+sum +
+(
+expense.yourContribution ??
+expense.amount
+),
+0
+);
+
+
+document.getElementById(
+"salary"
+).value =
+data.salary || "";
+
+document.getElementById(
+"iterationName"
+).value =
+currentIteration;
+
+
+document.getElementById(
+"statSalary"
+).textContent =
+INR(salary);
+
+document.getElementById(
+"statBudget"
+).textContent =
+INR(salary);
+
+document.getElementById(
+"statActual"
+).textContent =
+INR(actual);
+
+document.getElementById(
+"statRemaining"
+).textContent =
+INR(salary-actual);
+
+
+renderCategories();
+
+renderRecentExpenses();
+
+renderHistory();
+
+}
+
+
+function renderCategories() {
+
+let data = currentData();
+
+let salary =
+Number(data.salary)||0;
+
+let html = "";
+
+CATEGORIES.forEach(
+category => {
+
+let name =
+category[0];
+
+let percentage =
+category[1];
+
+let budget =
+salary *
+percentage /
+100;
+
+let actual =
+data.expenses
+.filter(
+expense =>
+expense.category === name
+)
+.reduce(
+(sum,expense) =>
+sum +
+(
+expense.yourContribution ??
+expense.amount
+),
+0
+);
+
+let difference =
+budget-actual;
+
+let percentageUsed =
+budget
+? Math.min(
+100,
+actual/budget*100
+)
+:0;
+
+
+html += `
+
+<div class="row">
+
+<div class="category-head">
+
+<div>
+
+<b>
+${escapeHTML(name)}
+</b>
+
+<div class="small muted">
+
+${percentage}%
+· Budget ${INR(budget)}
+
+</div>
+
+</div>
+
+<div style="text-align:right">
+
+<b>
+${INR(actual)}
+</b>
+
+<div class="small
+${difference >= 0
+? "good"
+: "bad"}">
+
+${difference >= 0
+? INR(difference)+" remaining"
+: INR(-difference)+" over"}
+
+</div>
+
+</div>
+
+</div>
+
+<div class="bar">
+
+<div
+class="fill"
+style="width:${percentageUsed}%">
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById(
+"categoryView"
+).innerHTML =
+html;
+
+}
+
+
+/* ==============================
+   EXPENSES
+============================== */
+
+function toggleShared() {
+
+let shared =
+document.getElementById(
+"expenseType"
+).value === "shared";
+
+document.getElementById(
+"sharedPanel"
+).classList.toggle(
+"hidden",
+!shared
+);
+
+if (
+shared &&
+!document.getElementById(
+"contributors"
+).children.length
+) {
+
+addContributor();
+
+}
+
+}
+
+
+function addContributor(
+name="",
+amount=""
+) {
+
+let container =
+document.getElementById(
+"contributors"
+);
+
+let row =
+document.createElement("div");
+
+row.className =
+"person";
+
+row.innerHTML = `
+
+<input
+placeholder="Person name"
+value="${escapeHTML(name)}">
+
+<input
+type="number"
+min="0"
+placeholder="₹"
+value="${amount}">
+
+<button
+class="danger"
+onclick="
+this.parentElement.remove();
+updateContributorTotal();
+">
+
+×
+</button>
+
+`;
+
+row.querySelectorAll("input")
+.forEach(
+input =>
+input.oninput =
+updateContributorTotal
+);
+
+container.appendChild(row);
+
+updateContributorTotal();
+
+}
+
+
+function updateContributorTotal() {
+
+let total = 0;
+
+document
+.querySelectorAll(
+"#contributors .person"
+)
+.forEach(row => {
+
+total +=
+Number(
+row.children[1].value
+)||0;
+
+});
+
+document.getElementById(
+"contributorTotal"
+).textContent =
+"Total: "+INR(total);
+
+}
+
+
+function saveExpense() {
+
+let amount =
+Number(
+document.getElementById(
+"expenseAmount"
+).value
+)||0;
+
+if (amount <= 0) {
+
+alert(
+"Enter an expense amount."
+);
+
+return;
+
+}
+
+
+let type =
+document.getElementById(
+"expenseType"
+).value;
+
+let contributors = [];
+
+
+if (type === "shared") {
+
+document
+.querySelectorAll(
+"#contributors .person"
+)
+.forEach(row => {
+
+contributors.push({
+
+name:
+row.children[0].value.trim(),
+
+amount:
+Number(
+row.children[1].value
+)||0
+
+});
+
+});
+
+
+if (
+!contributors.length ||
+contributors.some(
+person => !person.name
+)
+) {
+
+alert(
+"Enter all contributor names."
+);
+
+return;
+
+}
+
+
+let contributorTotal =
+contributors.reduce(
+(sum,person) =>
+sum+person.amount,
+0
+);
+
+
+if (
+contributorTotal !== amount
+) {
+
+alert(
+"Contributor amounts must equal the group expense."
+);
+
+return;
+
+}
+
+}
+
+
+let yourContribution =
+amount;
+
+
+if (type === "shared") {
+
+let me =
+contributors.find(
+person =>
+person.name
+.toLowerCase()
+=== "me"
+);
+
+yourContribution =
+me
+? me.amount
+: 0;
+
+}
+
+
+let expense = {
+
+id:
+editingExpenseId ||
+Date.now(),
+
+amount:
+
+amount,
+
+yourContribution:
+
+yourContribution,
+
+date:
+
+document.getElementById(
+"expenseDate"
+).value,
+
+category:
+
+document.getElementById(
+"expenseCategory"
+).value,
+
+payment:
+
+document.getElementById(
+"paymentMethod"
+).value,
+
+description:
+
+document.getElementById(
+"expenseDescription"
+).value
+.trim(),
+
+type:
+
+type,
+
+contributors:
+
+contributors
+
+};
+
+
+let expenses =
+currentData().expenses;
+
+
+if (editingExpenseId) {
+
+let index =
+expenses.findIndex(
+expense =>
+expense.id ===
+editingExpenseId
+);
+
+if (index >= 0) {
+
+expenses[index] =
+expense;
+
+}
+
+} else {
+
+expenses.push(expense);
+
+}
+
+
+saveDatabase();
+
+clearExpenseForm();
+
+render();
+
+showTab("dashboard");
+
+}
+
+
+function editExpense(id) {
+
+let expense =
+currentData()
+.expenses
+.find(
+expense =>
+expense.id === id
+);
+
+if (!expense) return;
+
+editingExpenseId = id;
+
+document.getElementById(
+"expenseFormTitle"
+).textContent =
+"Edit Expense";
+
+document.getElementById(
+"expenseAmount"
+).value =
+expense.amount;
+
+document.getElementById(
+"expenseDate"
+).value =
+expense.date;
+
+document.getElementById(
+"expenseCategory"
+).value =
+expense.category;
+
+document.getElementById(
+"paymentMethod"
+).value =
+expense.payment;
+
+document.getElementById(
+"expenseDescription"
+).value =
+expense.description || "";
+
+document.getElementById(
+"expenseType"
+).value =
+expense.type || "personal";
+
+
+document.getElementById(
+"contributors"
+).innerHTML =
+"";
+
+
+if (
+expense.type === "shared"
+) {
+
+(expense.contributors || [])
+.forEach(
+person =>
+addContributor(
+person.name,
+person.amount
+)
+);
+
+}
+
+
+toggleShared();
+
+showTab("expense");
+
+}
+
+
+function deleteExpense(id) {
+
+if (
+!confirm(
+"Delete this expense?"
+)
+) return;
+
+currentData().expenses =
+currentData()
+.expenses
+.filter(
+expense =>
+expense.id !== id
+);
+
+saveDatabase();
+
+render();
+
+}
+
+
+function clearExpenseForm() {
+
+editingExpenseId = null;
+
+document.getElementById(
+"expenseFormTitle"
+).textContent =
+"Add Expense";
+
+document.getElementById(
+"expenseAmount"
+).value =
+"";
+
+document.getElementById(
+"expenseDescription"
+).value =
+"";
+
+document.getElementById(
+"expenseType"
+).value =
+"personal";
+
+document.getElementById(
+"contributors"
+).innerHTML =
+"";
+
+document.getElementById(
+"sharedPanel"
+).classList.add(
+"hidden"
+);
+
+}
+
+
+function expenseHTML(
+expense,
+showButtons
+) {
+
+let shared =
+expense.type === "shared";
+
+let contributors =
+(expense.contributors || [])
+.map(
+person =>
+escapeHTML(person.name)
++": "+
+INR(person.amount)
+)
+.join(" · ");
+
+
+return `
+
+<div class="row">
+
+<div class="expense">
+
+<div>
+
+<b>
+
+${escapeHTML(
+expense.description ||
+expense.category
+)}
+
+</b>
+
+<div class="small muted">
+
+${escapeHTML(
+expense.category
+)}
+·
+${escapeHTML(
+expense.payment
+)}
+·
+${escapeHTML(
+expense.date
+)}
+
+${shared
+? '<span class="chip">Shared</span>'
+: ''}
+
+</div>
+
+
+${
+shared
+? `
+
+<div class="small">
+
+Group total:
+${INR(expense.amount)}
+
+<br>
+
+Your contribution:
+${INR(expense.yourContribution)}
+
+<br>
+
+${contributors}
+
+</div>
+
+`
+: ""
+}
+
+</div>
+
+
+<div style="text-align:right">
+
+<b>
+
+${INR(
+expense.yourContribution ??
+expense.amount
+)}
+
+</b>
+
+
+${
+showButtons
+? `
+
+<div class="actions">
+
+<button
+class="secondary"
+onclick="
+editExpense(${expense.id})
+">
+
+Edit
+
+</button>
+
+<button
+class="danger"
+onclick="
+deleteExpense(${expense.id})
+">
+
+Delete
+
+</button>
+
+</div>
+
+`
+: ""
+}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+function renderRecentExpenses() {
+
+let expenses =
+[
+...currentData().expenses
+]
+.sort(
+(a,b) =>
+b.date.localeCompare(a.date)
+)
+.slice(0,5);
+
+
+document.getElementById(
+"recentExpenses"
+).innerHTML =
+
+expenses.length
+? expenses
+.map(
+expense =>
+expenseHTML(
+expense,
+false
+)
+)
+.join("")
+: '<div class="empty">No expenses.</div>';
+
+}
+
+
+/* ==============================
+   HISTORY
+============================== */
+
+function renderHistory() {
+
+let category =
+document.getElementById(
+"filterCategory"
+).value;
+
+let search =
+(
+document.getElementById(
+"searchExpense"
+).value || ""
+)
+.toLowerCase();
+
+
+let expenses =
+currentData()
+.expenses
+.filter(
+expense => {
+
+let categoryMatch =
+!category ||
+expense.category ===
+category;
+
+let searchMatch =
+!search ||
+JSON.stringify(expense)
+.toLowerCase()
+.includes(search);
+
+return categoryMatch &&
+searchMatch;
+
+})
+.sort(
+(a,b) =>
+b.date.localeCompare(a.date)
+);
+
+
+document.getElementById(
+"historyList"
+).innerHTML =
+
+expenses.length
+? expenses
+.map(
+expense =>
+expenseHTML(
+expense,
+true
+)
+)
+.join("")
+: '<div class="empty">No matching expenses.</div>';
+
+}
+
+
+/* ==============================
+   CSV EXPORT
+============================== */
+
+function csvEscape(value) {
+
+return '"'+
+String(value ?? "")
+.replace(/"/g,'""')+
+'"';
+
+}
+
+
+function exportCSV() {
+
+let rows = [[
+
+"Month",
+
+"Iteration",
+
+"Salary (INR)",
+
+"Category",
+
+"Budget %",
+
+"Budget (INR)",
+
+"Group Expense (INR)",
+
+"Your Contribution (INR)",
+
+"Date",
+
+"Payment Method",
+
+"Description",
+
+"Expense Type",
+
+"Contributors"
+
+]];
+
+
+Object.entries(
+database.months
+)
+.forEach(
+([month,monthData]) => {
+
+Object.entries(
+monthData.iterations
+)
+.forEach(
+([iteration,data]) => {
+
+data.expenses.forEach(
+expense => {
+
+let category =
+CATEGORIES.find(
+category =>
+category[0] ===
+expense.category
+);
+
+let percentage =
+category
+? category[1]
+: 0;
+
+let budget =
+(
+data.salary || 0
+) *
+percentage /
+100;
+
+
+let contributors =
+(
+expense.contributors || []
+)
+.map(
+person =>
+person.name+
+":"+
+person.amount
+)
+.join("|");
+
+
+rows.push([
+
+month,
+
+iteration,
+
+data.salary,
+
+expense.category,
+
+percentage,
+
+budget,
+
+expense.amount,
+
+expense.yourContribution ??
+expense.amount,
+
+expense.date,
+
+expense.payment,
+
+expense.description,
+
+expense.type,
+
+contributors
+
+]);
+
+});
+
+});
+
+});
+
+
+let csv =
+"\uFEFF"+
+rows
+.map(
+row =>
+row
+.map(csvEscape)
+.join(",")
+)
+.join("\r\n");
+
+
+downloadFile(
+
+new Blob(
+[csv],
+{
+type:
+"text/csv;charset=utf-8"
+}
+),
+
+"my-budget-export.csv"
+
+);
+
+}
+
+
+/* ==============================
+   CSV IMPORT
+============================== */
+
+function parseCSV(text) {
+
+let rows = [];
+
+let row = [];
+
+let value = "";
+
+let quoted = false;
+
+
+for (
+let i=0;
+i<text.length;
+i++
+) {
+
+let char =
+text[i];
+
+
+if (char === '"') {
+
+if (
+quoted &&
+text[i+1] === '"'
+) {
+
+value += '"';
+
+i++;
+
+} else {
+
+quoted = !quoted;
+
+}
+
+}
+
+else if (
+char === "," &&
+!quoted
+) {
+
+row.push(value);
+
+value = "";
+
+}
+
+else if (
+(
+char === "\n" ||
+char === "\r"
+) &&
+!quoted
+) {
+
+if (
+char === "\r" &&
+text[i+1] === "\n"
+) {
+
+i++;
+
+}
+
+row.push(value);
+
+if (
+row.some(
+item => item !== ""
+)
+) {
+
+rows.push(row);
+
+}
+
+row = [];
+
+value = "";
+
+}
+
+else {
+
+value += char;
+
+}
+
+}
+
+
+if (
+value ||
+row.length
+) {
+
+row.push(value);
+
+rows.push(row);
+
+}
+
+
+return rows;
+
+}
+
+
+function importCSV(event) {
+
+let file =
+event.target.files[0];
+
+if (!file) return;
+
+
+let reader =
+new FileReader();
+
+
+reader.onload =
+function() {
+
+try {
+
+let rows =
+parseCSV(
+reader.result
+);
+
+let headers =
+rows.shift();
+
+
+function column(name) {
+
+return headers.indexOf(name);
+
+}
+
+
+rows.forEach(
+row => {
+
+let month =
+row[
+column("Month")
+];
+
+let iteration =
+row[
+column("Iteration")
+] ||
+"Default";
+
+
+if (!month) return;
+
+
+let monthData =
+ensureMonth(month);
+
+
+if (
+!monthData
+.iterations
+[iteration]
+) {
+
+monthData
+.iterations
+[iteration] = {
+
+salary:
+Number(
+row[
+column(
+"Salary (INR)"
+)
+]
+)||0,
+
+expenses:[]
+
+};
+
+}
+
+
+let data =
+monthData
+.iterations
+[iteration];
+
+
+let contributorText =
+row[
+column("Contributors")
+] || "";
+
+
+let contributors =
+contributorText
+.split("|")
+.filter(Boolean)
+.map(
+item => {
+
+let separator =
+item.lastIndexOf(":");
+
+return {
+
+name:
+item.substring(
+0,
+separator
+),
+
+amount:
+Number(
+item.substring(
+separator+1
+)
+)||0
+
+};
+
+});
+
+
+data.expenses.push({
+
+id:
+Date.now()+
+Math.random(),
+
+amount:
+Number(
+row[
+column(
+"Group Expense (INR)"
+)
+]
+)||0,
+
+yourContribution:
+Number(
+row[
+column(
+"Your Contribution (INR)"
+)
+]
+)||0,
+
+date:
+row[
+column("Date")
+],
+
+category:
+row[
+column("Category")
+],
+
+payment:
+row[
+column("Payment Method")
+],
+
+description:
+row[
+column("Description")
+],
+
+type:
+row[
+column("Expense Type")
+] ||
+"personal",
+
+contributors:
+contributors
+
+});
+
+});
+
+
+saveDatabase();
+
+render();
+
+alert(
+"CSV imported successfully."
+);
+
+}
+
+catch(error) {
+
+alert(
+"CSV import failed. Please use a CSV exported by this app."
+);
+
+}
+
+};
+
+
+reader.readAsText(file);
+
+}
+
+
+/* ==============================
+   FILE DOWNLOAD
+============================== */
+
+function downloadFile(
+blob,
+filename
+) {
+
+let link =
+document.createElement("a");
+
+link.href =
+URL.createObjectURL(blob);
+
+link.download =
+filename;
+
+link.click();
+
+setTimeout(
+() =>
+URL.revokeObjectURL(
+link.href
+),
+1000
+);
+
+}
+
+
+/* ==============================
+   ENCRYPTED BACKUP
+============================== */
+
+async function exportEncryptedBackup() {
+
+let password =
+prompt(
+"Create a backup password (minimum 8 characters):"
+);
+
+if (
+!password ||
+password.length < 8
+) {
+
+alert(
+"Please use at least 8 characters."
+);
+
+return;
+
+}
+
+
+let encoder =
+new TextEncoder();
+
+
+let salt =
+crypto.getRandomValues(
+new Uint8Array(16)
+);
+
+let iv =
+crypto.getRandomValues(
+new Uint8Array(12)
+);
+
+
+let baseKey =
+await crypto.subtle.importKey(
+
+"raw",
+
+encoder.encode(
+password
+),
+
+"PBKDF2",
+
+false,
+
+["deriveKey"]
+
+);
+
+
+let key =
+await crypto.subtle.deriveKey(
+
+{
+
+name:"PBKDF2",
+
+salt:salt,
+
+iterations:250000,
+
+hash:"SHA-256"
+
+},
+
+baseKey,
+
+{
+
+name:"AES-GCM",
+
+length:256
+
+},
+
+false,
+
+["encrypt"]
+
+);
+
+
+let encrypted =
+await crypto.subtle.encrypt(
+
+{
+
+name:"AES-GCM",
+
+iv:iv
+
+},
+
+key,
+
+encoder.encode(
+JSON.stringify(
+database
+)
+)
+
+);
+
+
+let backup = {
+
+version:1,
+
+salt:
+Array.from(salt),
+
+iv:
+Array.from(iv),
+
+data:
+Array.from(
+new Uint8Array(
+encrypted
+)
+)
+
+};
+
+
+downloadFile(
+
+new Blob(
+[
+JSON.stringify(backup)
+],
+{
+type:
+"application/octet-stream"
+}
+),
+
+"my-budget-encrypted-backup.mbbackup"
+
+);
+
+}
+
+
+/* ==============================
+   ENCRYPTED RESTORE
+============================== */
+
+async function importEncryptedBackup(
+event
+) {
+
+let file =
+event.target.files[0];
+
+if (!file) return;
+
+
+let reader =
+new FileReader();
+
+
+reader.onload =
+async function() {
+
+try {
+
+let backup =
+JSON.parse(
+reader.result
+);
+
+let password =
+prompt(
+"Enter your backup password:"
+);
+
+if (!password) return;
+
+
+let encoder =
+new TextEncoder();
+
+let decoder =
+new TextDecoder();
+
+
+let baseKey =
+await crypto.subtle.importKey(
+
+"raw",
+
+encoder.encode(
+password
+),
+
+"PBKDF2",
+
+false,
+
+["deriveKey"]
+
+);
+
+
+let key =
+await crypto.subtle.deriveKey(
+
+{
+
+name:"PBKDF2",
+
+salt:
+new Uint8Array(
+backup.salt
+),
+
+iterations:250000,
+
+hash:"SHA-256"
+
+},
+
+baseKey,
+
+{
+
+name:"AES-GCM",
+
+length:256
+
+},
+
+false,
+
+["decrypt"]
+
+);
+
+
+let decrypted =
+await crypto.subtle.decrypt(
+
+{
+
+name:"AES-GCM",
+
+iv:
+new Uint8Array(
+backup.iv
+)
+
+},
+
+key,
+
+new Uint8Array(
+backup.data
+)
+
+);
+
+
+let restored =
+JSON.parse(
+decoder.decode(
+decrypted
+)
+);
+
+
+if (!restored.months) {
+
+throw new Error();
+
+}
+
+
+database =
+restored;
+
+saveDatabase();
+
+currentIteration = "";
+
+loadIterations();
+
+render();
+
+
+alert(
+"Backup restored successfully."
+);
+
+}
+
+catch(error) {
+
+alert(
+"Restore failed. Check the password and backup file."
+);
+
+}
+
+};
+
+
+reader.readAsText(file);
+
+}
+
+
+/* ==============================
+   PIN SECURITY
+============================== */
+
+async function hashPIN(pin) {
+
+let buffer =
+await crypto.subtle.digest(
+
+"SHA-256",
+
+new TextEncoder()
+.encode(pin)
+
+);
+
+
+return Array
+.from(
+new Uint8Array(buffer)
+)
+.map(
+byte =>
+byte
+.toString(16)
+.padStart(2,"0")
+)
+.join("");
+
+}
+
+
+async function createPIN() {
+
+let pin1 =
+document.getElementById(
+"pin1"
+).value;
+
+let pin2 =
+document.getElementById(
+"pin2"
+).value;
+
+
+if (!/^\d{4,8}$/.test(pin1)) {
+
+document.getElementById(
+"pinError"
+).textContent =
+"PIN must contain 4–8 digits.";
+
+return;
+
+}
+
+
+if (pin1 !== pin2) {
+
+document.getElementById(
+"pinError"
+).textContent =
+"PINs do not match.";
+
+return;
+
+}
+
+
+localStorage.setItem(
+PIN_KEY,
+await hashPIN(pin1)
+);
+
+sessionStorage.setItem(
+"budgetUnlocked",
+"1"
+);
+
+document.getElementById(
+"lockScreen"
+).style.display =
+"none";
+
+}
+
+
+async function unlockApp() {
+
+let pin =
+document.getElementById(
+"pinInput"
+).value;
+
+
+let stored =
+localStorage.getItem(
+PIN_KEY
+);
+
+
+if (
+await hashPIN(pin) ===
+stored
+) {
+
+sessionStorage.setItem(
+"budgetUnlocked",
+"1"
+);
+
+document.getElementById(
+"lockScreen"
+).style.display =
+"none";
+
+}
+
+else {
+
+document.getElementById(
+"pinError"
+).textContent =
+"Incorrect PIN.";
+
+}
+
+}
+
+
+function initializeLock() {
+
+if (
+sessionStorage.getItem(
+"budgetUnlocked"
+) === "1"
+) {
+
+document.getElementById(
+"lockScreen"
+).style.display =
+"none";
+
+return;
+
+}
+
+
+if (
+localStorage.getItem(
+PIN_KEY
+)
+) {
+
+document.getElementById(
+"pinSetup"
+).classList.add(
+"hidden"
+);
+
+document.getElementById(
+"pinLogin"
+).classList.remove(
+"hidden"
+);
+
+}
+
+}
+
+
+/* ==============================
+   START APP
+============================== */
+
+document.getElementById(
+"month"
+).value =
+currentMonth;
+
+
+document.getElementById(
+"expenseDate"
+).value =
+new Date()
+.toISOString()
+.slice(0,10);
+
+
+loadIterations();
+
+render();
+
+initializeLock();
+
+</script>
+
+</body>
+</html>
